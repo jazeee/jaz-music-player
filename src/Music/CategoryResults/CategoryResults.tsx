@@ -1,7 +1,7 @@
 import { Table, TableContainer, TableBody, TableRow, TableCell, Paper, styled } from "@material-ui/core";
 import { CategoryType } from "../data/categories";
 import { ALL_BY_CATEGORY, ALL_INDICES, MUSIC_BY_CATEGORY } from "../data/data"
-import { useSelectedMusicContext } from "../Layout/SelectedMusic";
+import { useSelectedMusicContext } from "../../Layout/SelectedMusic";
 
 const SelectableTableRow = styled(TableRow)({
   cursor: 'pointer',

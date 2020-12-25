@@ -1,10 +1,10 @@
 import { styled } from "@material-ui/core";
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
-import { CategoryResults } from "../CategoryResults/CategoryResults";
-import { CategoryType } from "../data/categories";
+import { CategoryResults } from "../Music/CategoryResults/CategoryResults";
+import { CategoryType } from "../Music/data/categories";
 import { FilterSidebar } from "../FilterSidebar/FilterSidebar";
-import { MusicPlayer } from "../MusicPlayer/MusicPlayer";
+import { MusicPlayer } from "../Music/MusicPlayer/MusicPlayer";
 import { NavBar } from "../Nav/NavBar";
 import { SelectedMusicProvider } from "./SelectedMusic";
 
