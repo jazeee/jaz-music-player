@@ -1,32 +1,14 @@
 import { styled } from "@material-ui/core";
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
-import { CategoryResults } from "../Music/CategoryResults/CategoryResults";
-import { CategoryType } from "../Music/data/categories";
 import { FilterSidebar } from "../FilterSidebar/FilterSidebar";
-import { MusicPlayer } from "../Music/MusicPlayer/MusicPlayer";
 import { NavBar } from "../Nav/NavBar";
-import { SelectedMusicProvider } from "./SelectedMusic";
 
 const AppContainer = styled('div')({
   height: '100vh',
   display: 'flex',
   flexDirection: 'column',
 });
-
-const PlayerPanel = styled('div')({
-})
-
-const CategoryPanel = styled('div')({
-  minHeight: 240,
-  maxHeight: 480,
-  overflowY: 'auto',
-})
-
-const MusicPanel = styled('div')({
-  flex: 'auto',
-  overflowY: 'auto',
-})
 
 export function Layout() {
   const [menuIsOpen, setMenuIsOpen] = useState(false);
@@ -35,17 +17,7 @@ export function Layout() {
       <FilterSidebar menuIsOpen={menuIsOpen} setMenuIsOpen={setMenuIsOpen}/>
       <AppContainer>
         <NavBar onClickMenu={() => setMenuIsOpen(value => !value)}/>
-        <SelectedMusicProvider>
-          <PlayerPanel>
-            <MusicPlayer />
-          </PlayerPanel>
-          <CategoryPanel>
-            <CategoryResults category={CategoryType.ALBUM} />
-          </CategoryPanel>
-          <MusicPanel>
-            <Outlet />
-          </MusicPanel>
-        </SelectedMusicProvider>
+        <Outlet />
       </AppContainer>
     </>
   )

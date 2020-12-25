@@ -1,5 +1,6 @@
 import { List, ListItem, ListItemText, SwipeableDrawer } from "@material-ui/core";
 import { useNavigate } from "react-router-dom";
+import { CategoryType, CATEGORY_PATHS } from "../Music/data/categories";
 
 interface Props {
   menuIsOpen: boolean;
@@ -7,24 +8,6 @@ interface Props {
 };
 
 const anchor = 'left';
-const OPTIONS = [
-  {
-    title: 'All',
-    path: '/',
-  },
-  {
-    title: 'By Genre',
-    path: '/genres',
-  },
-  {
-    title: 'By Album',
-    path: '/albums',
-  },
-  {
-    title: 'By Artist',
-    path: '/artists',
-  },
-];
 
 export function FilterSidebar(props: Props) {
   const { menuIsOpen, setMenuIsOpen } = props;
@@ -33,14 +16,17 @@ export function FilterSidebar(props: Props) {
   return (
     <SwipeableDrawer anchor={anchor} open={menuIsOpen} onOpen={() => setMenuIsOpen(true)} onClose={() => setMenuIsOpen(false)}>
       <List>
-        {OPTIONS.map(({ title, path }) => (
-          <ListItem button key={title} onClick={() => {
-            setMenuIsOpen(false);
-            navigate(path);
-          }}>
-            <ListItemText primary={title} />
-          </ListItem>
-        ))}
+        {Object.values(CategoryType).map((category) => {
+          const path = `/music/${CATEGORY_PATHS[category]}`;
+          return (
+            <ListItem button key={category} onClick={() => {
+              setMenuIsOpen(false);
+              navigate(path);
+            }}>
+              <ListItemText primary={category} />
+            </ListItem>
+          );
+        })}
       </List>
     </SwipeableDrawer>
   );

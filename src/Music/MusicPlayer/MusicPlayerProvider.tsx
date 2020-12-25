@@ -1,6 +1,6 @@
 import constate from 'constate';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useSelectedMusicContext } from '../../Layout/SelectedMusic';
+import { useSelectedMusicContext } from '../SelectedMusic';
 import { musicData } from '../data/data';
 
 const MUSIC_PREFIX_URL = process.env.REACT_APP_MUSIC_SRC ?? '/music';
@@ -32,6 +32,7 @@ export function useMusicPlayer() {
   const currentFullFilePath = currentFilePathSuffix ? `${MUSIC_PREFIX_URL}/${currentFilePathSuffix}` : '';
   const nextMusicIndex = playIndices?.[(nowPlayingIndex + 1) % (playListLength)];
   const nextFilePathSuffix = musicData[nextMusicIndex]?.fileName;
+  const nextFullFilePath = nextFilePathSuffix ? `${MUSIC_PREFIX_URL}/${nextFilePathSuffix}` : '';
 
   const updatePlayer = useCallback(function (playerState: PLAYER_STATE) {
     const el = ref.current;
@@ -106,6 +107,7 @@ export function useMusicPlayer() {
     currentFullFilePath,
     currentFilePathSuffix,
     nextFilePathSuffix,
+    nextFullFilePath,
     nowPlayingIndex,
     setNowPlayingIndex,
     playerState, setPlayerState,

@@ -1,6 +1,6 @@
 import { Container, Grid } from "@material-ui/core";
 import { musicData } from '../data/data';
-import { useSelectedMusicContext } from "../../Layout/SelectedMusic";
+import { useSelectedMusicContext } from "../SelectedMusic";
 import { MusicCard } from "./components/MusicCard";
 
 // const someData:Array<MusicDatum> = [];

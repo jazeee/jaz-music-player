@@ -4,7 +4,7 @@ import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
 // import StopIcon from '@material-ui/icons/Stop';
 import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
-import { PLAYER_STATE, useMusicPlayer } from "./useMusicPlayer";
+import { PLAYER_STATE, useMusicPlayerContext } from "./MusicPlayerProvider";
 
 // enum ORDER_STATE {
 //   REPEAT_ALL = 'Repeat All',
@@ -23,6 +23,7 @@ export function MusicPlayer() {
     currentFullFilePath,
     currentFilePathSuffix,
     nextFilePathSuffix,
+    nextFullFilePath,
     goToNext,
     goToPrevious,
     setIsLoading,
@@ -35,24 +36,28 @@ export function MusicPlayer() {
     setPlayerState,
     volume,
     setVolume,
-  } = useMusicPlayer();
+  } = useMusicPlayerContext();
 
   return (
     <>
       <Container>
         {Boolean(currentFullFilePath) &&
-          <audio ref={ref} src={currentFullFilePath} onEnded={goToNext} onWaiting={() => {setIsLoading(true)}} onPlaying={() => {setIsLoading(false)}} onTimeUpdate={() => {
+          <audio ref={ref} src={currentFullFilePath} onEnded={goToNext} onWaiting={() => { setIsLoading(true) }} onPlaying={() => { setIsLoading(false) }} onTimeUpdate={() => {
             setPlaybackTime(ref.current?.duration ?? 0);
             setCurrentTime(ref.current?.currentTime ?? 0);
           }}
-          onPlay={() => setPlayerState(PLAYER_STATE.PLAYING)}
-          onPause={() => setPlayerState(PLAYER_STATE.PAUSED)}
-          onVolumeChange={() => {
-            if (ref.current){
-              setVolume(ref.current.volume);
-            }
-          }}
+            onPlay={() => setPlayerState(PLAYER_STATE.PLAYING)}
+            onPause={() => setPlayerState(PLAYER_STATE.PAUSED)}
+            onVolumeChange={() => {
+              if (ref.current) {
+                setVolume(ref.current.volume);
+              }
+            }}
           />
+        }
+        {Boolean(nextFullFilePath) &&
+          // Cache next file
+          <audio src={nextFullFilePath} />
         }
         <Grid container spacing={1}>
           <Grid item xs={12}>
@@ -73,13 +78,13 @@ export function MusicPlayer() {
                     time = Math.min(playbackTime, Math.max(0, time as number));
                     ref.current.currentTime = time;
                   }
-                }}/>
+                }} />
               </Grid>
               <Grid item xs={6} sm={4}>
                 <Typography variant="body1">Volume</Typography>
                 <Slider value={volume} max={1.0} step={0.01} onChange={(__event, newVolume) => {
                   setVolume(newVolume as number)
-                }}/>
+                }} />
               </Grid>
             </Grid>
           </Grid>
