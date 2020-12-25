@@ -1,4 +1,4 @@
-import { Container, Grid, IconButton, LinearProgress, Typography } from "@material-ui/core";
+import { Container, Grid, IconButton, LinearProgress, Slider, Typography } from "@material-ui/core";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { musicData } from "../data/data";
 import { useSelectedMusicContext } from "../Layout/SelectedMusic";
@@ -27,6 +27,7 @@ export function MusicPlayer() {
   const [isLoading, setIsLoading] = useState(false);
   const [currentTime, setCurrentTime] = useState(0)
   const [playbackTime, setPlaybackTime] = useState(0)
+  const [volume, setVolume] = useState(0.5);
 
   const ref = useRef<HTMLAudioElement | null>(null);
   const playIndices = [...selectedIndices];
@@ -64,6 +65,13 @@ export function MusicPlayer() {
   }, [updatePlayer, playerState])
 
   useEffect(() => {
+    const el = ref.current;
+    if (el) {
+      el.volume = volume;
+    }
+  }, [volume]);
+
+  useEffect(() => {
     setPlayerState(playerState => {
       if (playerState === PLAYER_STATE.UNSET) {
         playerState = currentFullFilePath ? PLAYER_STATE.PLAYING: PLAYER_STATE.PAUSED;
@@ -99,41 +107,68 @@ export function MusicPlayer() {
 
   function goToNext() {
     setNowPlayingIndex(index => { return (index + 1) % playListLength });
-  }
-
-  function onEnded() {
-    if (playerState === PLAYER_STATE.PLAYING) {
-      goToNext();
-    }
+    setPlayerState(PLAYER_STATE.PLAYING);
   }
 
   return (
     <>
       <Container>
         {Boolean(currentFullFilePath) &&
-          <audio ref={ref} src={currentFullFilePath} onEnded={onEnded} onWaiting={() => {setIsLoading(true)}} onPlaying={() => {setIsLoading(false)}} onTimeUpdate={() => {
+          <audio ref={ref} src={currentFullFilePath} onEnded={goToNext} onWaiting={() => {setIsLoading(true)}} onPlaying={() => {setIsLoading(false)}} onTimeUpdate={() => {
             setPlaybackTime(ref.current?.duration ?? 0);
             setCurrentTime(ref.current?.currentTime ?? 0);
-          }}/>
+          }}
+          onPlay={() => setPlayerState(PLAYER_STATE.PLAYING)}
+          onPause={() => setPlayerState(PLAYER_STATE.PAUSED)}
+          onVolumeChange={() => {
+            if (ref.current){
+              setVolume(ref.current.volume);
+            }
+          }}
+          controls
+          />
         }
         <Grid container spacing={1}>
-          <Grid item xs={12} sm={4}>
-            <IconButton onClick={goToPrevious}><SkipPreviousIcon /></IconButton>
-            {playerState !== PLAYER_STATE.PLAYING ?
-              <IconButton color="secondary" onClick={() => { setPlayerState(PLAYER_STATE.PLAYING) }}><PlayCircleFilledIcon /></IconButton> :
-              <IconButton color="secondary" onClick={() => { setPlayerState(PLAYER_STATE.PAUSED) }}><PauseCircleFilledIcon /></IconButton>
-            }
-            <IconButton onClick={goToNext}><SkipNextIcon /></IconButton>
+          <Grid item xs={12}>
+            <Grid container spacing={1}>
+              <Grid item xs={12} sm={4}>
+                <IconButton onClick={goToPrevious}><SkipPreviousIcon /></IconButton>
+                {playerState !== PLAYER_STATE.PLAYING ?
+                  <IconButton color="secondary" onClick={() => { setPlayerState(PLAYER_STATE.PLAYING) }}><PlayCircleFilledIcon /></IconButton> :
+                  <IconButton color="secondary" onClick={() => { setPlayerState(PLAYER_STATE.PAUSED) }}><PauseCircleFilledIcon /></IconButton>
+                }
+                <IconButton onClick={goToNext}><SkipNextIcon /></IconButton>
+              </Grid>
+              <Grid item xs={6} sm={4}>
+                <Typography variant="body1">Progress</Typography>
+                <Slider value={currentTime} max={playbackTime} onChange={(__event, time) => {
+                  if (ref.current && playbackTime) {
+                    time = Math.min(playbackTime, Math.max(0, time as number));
+                    ref.current.currentTime = time;
+                  }
+                }}/>
+              </Grid>
+              <Grid item xs={6} sm={4}>
+                <Typography variant="body1">Volume</Typography>
+                <Slider value={volume} max={1.0} step={0.01} onChange={(__event, newVolume) => {
+                  setVolume(newVolume as number)
+                }}/>
+              </Grid>
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={8}>
+          <Grid item xs={6}>
             <Typography variant="body1">Current: {currentFilePathSuffix}</Typography>
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={6} >
             <Typography variant="body2">Next Up: {musicData[nextMusicIndex]?.fileName}</Typography>
           </Grid>
         </Grid>
       </Container>
-      <LinearProgress variant={isLoading? undefined : 'determinate'} value={isLoading ? undefined : (currentTime > 0 && playbackTime > 0 ? (100 * currentTime/playbackTime): undefined)}/>
+      {isLoading ?
+        <LinearProgress />
+        :
+        <LinearProgress variant="determinate" value={currentTime > 0 && playbackTime > 0 ? (100 * currentTime / playbackTime) : 0} />
+      }
     </>
   )
 }
