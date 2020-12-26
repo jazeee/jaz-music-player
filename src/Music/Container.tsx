@@ -13,6 +13,8 @@ const PlayerPanel = styled('div')({
 const CategoryPanel = styled('div')({
   minHeight: 240,
   maxHeight: 480,
+  height: '40%',
+  marginBottom: 16,
   overflowY: 'auto',
 })
 

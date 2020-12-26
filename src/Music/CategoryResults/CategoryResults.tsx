@@ -1,12 +1,9 @@
-import { Table, TableContainer, TableBody, TableRow, TableCell, Paper, styled, Typography } from "@material-ui/core";
+import { Table, TableContainer, TableBody, TableCell, Paper, Typography } from "@material-ui/core";
 import { useEffect, useState } from "react";
+import { SelectableTableRow } from "../../lib/components/SelectedTableRow";
 import { CategoryType } from "../data/categories";
 import { ALL_BY_CATEGORY, ALL_INDICES, MUSIC_BY_CATEGORY } from "../data/data"
 import { useSelectedMusicContext } from "../SelectedMusic";
-
-const SelectableTableRow = styled(TableRow)({
-  cursor: 'pointer',
-});
 
 interface Props {
   category: CategoryType;
@@ -38,7 +35,7 @@ export function CategoryResults(props: Props) {
 
   return (
     <TableContainer component={Paper}>
-      <Table aria-label="simple table">
+      <Table aria-label="simple table" size="small">
         <TableBody>
           {[ALL_KEY, ...allByCategory].map((item) => {
             let text = item;
@@ -49,7 +46,7 @@ export function CategoryResults(props: Props) {
             return (
               <SelectableTableRow key={item} onClick={() => {onClick(item);}} selected={isSelected}>
                 <TableCell>
-                  <Typography variant={isSelected ? "h5" : "body2"}>
+                  <Typography variant={isSelected ? "body1" : "body2"}>
                     {isSelected && <span>&gt; </span>}
                     {text}
                   </Typography>

@@ -1,24 +1,16 @@
-import { Container, Grid } from "@material-ui/core";
-import { musicData } from '../data/data';
-import { useSelectedMusicContext } from "../SelectedMusic";
-import { MusicCard } from "./components/MusicCard";
+import { Box, Paper, Table, TableBody, TableContainer } from "@material-ui/core";
+import { MusicItems } from "./components/MusicItems";
 
-// const someData:Array<MusicDatum> = [];
-// for(let i = 0; i < 2000; i++) {
-//   someData.push(musicData[i]);
-// }
 export function MusicPicker() {
-  const { selectedIndices } = useSelectedMusicContext();
-  const music:Array<MusicDatum> = [];
-  selectedIndices.forEach(index => music.push(musicData[index]));
   return (
-    <Container>
-      <Grid container spacing={2}>
-        {music.map(musicDatum =>
-          <Grid item key={musicDatum.fileName} xs={12} sm={6}><MusicCard musicDatum={musicDatum} />
-          </Grid>
-        )}
-      </Grid>
-    </Container>
+    <TableContainer component={Paper} style={{ height: '100%'}}>
+      <Table aria-label="Music Table" size="small" style={{ height: '100%' }}>
+        <TableBody>
+          <Box sx={{width:"100%", height:"100%"}}>
+            <MusicItems />
+          </Box>
+        </TableBody>
+      </Table>
+    </TableContainer>
   )
 }
