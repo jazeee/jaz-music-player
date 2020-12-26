@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import qs from 'qs';
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { isArray } from 'lodash';
 
 export function useQuery(paramName: string) {
@@ -20,7 +20,7 @@ export function useQuery(paramName: string) {
     }
   }, [queryString, paramName]);
 
-  function setQueryParam(newValue: string | string[]) {
+  const setQueryParam = useCallback(function(newValue: string | string[]) {
     const result = qs.parse(queryString);
     const newSearch = qs.stringify({
       ...result,
@@ -28,8 +28,9 @@ export function useQuery(paramName: string) {
     });
     console.log('setting query to: ', newSearch)
     navigate({ search: `?${newSearch}` });
-  }
+  },[navigate, paramName, queryString]);
   console.log('queryParams', queryParams.param, queryParams.params);
+
   return {
     ...queryParams,
     setQueryParam,
