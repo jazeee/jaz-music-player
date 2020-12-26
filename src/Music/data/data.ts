@@ -29,11 +29,14 @@ musicData.forEach((datum, index) => {
   ALL_INDICES.push(index);
 });
 
-export const allArtists = Object.keys(byArtist);
-export const allAlbums = Object.keys(byAlbum);
-export const allGenres = Object.keys(byGenre);
-export const allDecades = Object.keys(byDecade);
-export const allYears = Object.keys(byYear);
+function compareIgnoreCase(a:string, b: string) {
+  return a.localeCompare(b, 'en', { sensitivity: 'base'});
+}
+export const allArtists = Object.keys(byArtist).sort(compareIgnoreCase);
+export const allAlbums = Object.keys(byAlbum).sort(compareIgnoreCase);
+export const allGenres = Object.keys(byGenre).sort(compareIgnoreCase);
+export const allDecades = Object.keys(byDecade).sort(compareIgnoreCase);
+export const allYears = Object.keys(byYear).sort(compareIgnoreCase);
 
 export const ALL_BY_CATEGORY: {[key in CategoryType]: Array<string>} = {
   [CategoryType.ARTIST]: allArtists,

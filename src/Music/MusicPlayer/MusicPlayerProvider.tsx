@@ -21,6 +21,7 @@ export function useMusicPlayer() {
   const [volume, setVolume] = useState(0.5);
 
   const ref = useRef<HTMLAudioElement | null>(null);
+  const el = ref.current;
   const playIndices = [...selectedIndices];
   const playListLength = playIndices?.length ?? 1;
   const currentMusicIndex = playIndices?.[nowPlayingIndex];
@@ -34,14 +35,13 @@ export function useMusicPlayer() {
   const nextFilePathSuffix = musicData[nextMusicIndex]?.fileName;
   const nextFullFilePath = nextFilePathSuffix ? `${MUSIC_PREFIX_URL}/${nextFilePathSuffix}` : '';
 
-  const updatePlayer = useCallback(function (playerState: PLAYER_STATE) {
-    const el = ref.current;
+  const updatePlayer = useCallback(function (newPlayerState: PLAYER_STATE) {
     if (!el) {
       return;
     }
-    switch (playerState) {
+    switch (newPlayerState) {
       case PLAYER_STATE.PLAYING:
-        el.play().then(console.log).catch(console.error)
+        el.play().catch(console.error)
         break;
       case PLAYER_STATE.PAUSED:
         el.pause()
@@ -49,24 +49,23 @@ export function useMusicPlayer() {
       case PLAYER_STATE.UNSET:
         break;
       default:
-        throw new Error(`Unexpected playerState: ${playerState}`);
+        throw new Error(`Unexpected playerState: ${newPlayerState}`);
     }
-  }, []);
+  }, [el]);
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.volume = volume;
+    }
+  }, [el, volume]);
 
   useEffect(() => {
     updatePlayer(playerState);
   }, [updatePlayer, playerState])
 
   useEffect(() => {
-    const el = ref.current;
-    if (el) {
-      el.volume = volume;
-    }
-  }, [volume]);
-
-  useEffect(() => {
     setPlayerState(playerState => {
-      if (playerState === PLAYER_STATE.UNSET) {
+      if (playerState !== PLAYER_STATE.UNSET) {
         playerState = currentFullFilePath ? PLAYER_STATE.PLAYING : PLAYER_STATE.PAUSED;
       }
       updatePlayer(playerState);
@@ -77,11 +76,11 @@ export function useMusicPlayer() {
   useEffect(() => {
     setNowPlayingIndex(0);
     setPlayerState(playerState => {
-      if (!selectedIndices) {
-        playerState = PLAYER_STATE.PAUSED;
-      }
       if (playerState !== PLAYER_STATE.PLAYING) {
         playerState = PLAYER_STATE.PLAYING;
+      }
+      if (!selectedIndices) {
+        playerState = PLAYER_STATE.PAUSED;
       }
       updatePlayer(playerState);
       return playerState;
@@ -102,6 +101,7 @@ export function useMusicPlayer() {
     setNowPlayingIndex(index => { return (index + 1) % playListLength });
     setPlayerState(PLAYER_STATE.PLAYING);
   }
+
   return {
     ref,
     currentFullFilePath,

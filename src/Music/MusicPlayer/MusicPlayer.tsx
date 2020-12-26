@@ -46,7 +46,12 @@ export function MusicPlayer() {
             setPlaybackTime(ref.current?.duration ?? 0);
             setCurrentTime(ref.current?.currentTime ?? 0);
           }}
-            onPlay={() => setPlayerState(PLAYER_STATE.PLAYING)}
+            onPlay={() => {
+              if (ref.current) {
+                ref.current.volume = volume
+              }
+              setPlayerState(PLAYER_STATE.PLAYING)
+            }}
             onPause={() => setPlayerState(PLAYER_STATE.PAUSED)}
             onVolumeChange={() => {
               if (ref.current) {
