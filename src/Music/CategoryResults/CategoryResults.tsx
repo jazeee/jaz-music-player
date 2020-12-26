@@ -1,5 +1,5 @@
 import { Table, TableContainer, TableBody, TableCell, Paper, Typography } from "@material-ui/core";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SelectableTableRow } from "../../lib/components/SelectedTableRow";
 import { useQuery } from "../../utils/hooks/useQuery";
 import { CategoryType } from "../data/categories";
@@ -20,6 +20,14 @@ export function CategoryResults(props: Props) {
   const musicByCategory = MUSIC_BY_CATEGORY[category];
   const [selectedItem, setSelectedItem] = useState<string>(param);
 
+  const availableItems = useMemo(() => [ALL_KEY, ...allByCategory], [allByCategory]);
+
+  useEffect(() => {
+    if (availableItems.includes(param)) {
+      setSelectedItem(param);
+    }
+  }, [param, availableItems]);
+
   useEffect(() => {
     if (category) {
       if (selectedItem === ALL_KEY) {
@@ -39,7 +47,7 @@ export function CategoryResults(props: Props) {
     <TableContainer component={Paper}>
       <Table aria-label="simple table" size="small">
         <TableBody>
-          {[ALL_KEY, ...allByCategory].map((item) => {
+          {availableItems.map((item) => {
             let text = item;
             if (item === ALL_KEY) {
               text = 'All';

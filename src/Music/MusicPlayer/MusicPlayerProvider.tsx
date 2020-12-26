@@ -2,6 +2,7 @@ import constate from 'constate';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelectedMusicContext } from '../SelectedMusic';
 import { musicData } from '../data/data';
+import { CategoryType } from '../data/categories';
 
 const MUSIC_PREFIX_URL = process.env.REACT_APP_MUSIC_SRC ?? '/music';
 
@@ -11,7 +12,7 @@ export enum PLAYER_STATE {
   PLAYING = 'Playing',
 }
 
-export function useMusicPlayer() {
+export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
   const { selectedIndices } = useSelectedMusicContext();
   const [nowPlayingIndex, setNowPlayingIndex] = useState(0);
   const [playerState, setPlayerState] = useState<PLAYER_STATE>(PLAYER_STATE.UNSET);
@@ -79,13 +80,13 @@ export function useMusicPlayer() {
       if (playerState !== PLAYER_STATE.PLAYING) {
         playerState = PLAYER_STATE.PLAYING;
       }
-      if (!selectedIndices) {
+      if (!categoryType) {
         playerState = PLAYER_STATE.PAUSED;
       }
       updatePlayer(playerState);
       return playerState;
     });
-  }, [selectedIndices, updatePlayer]);
+  }, [categoryType, updatePlayer]);
 
   function goToPrevious() {
     setNowPlayingIndex(index => {

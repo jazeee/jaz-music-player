@@ -29,7 +29,7 @@ export function MusicContainer() {
   return (
     <>
       <SelectedMusicProvider>
-        <MusicPlayerProvider>
+        <MusicPlayerProvider categoryType={categoryType}>
           <PlayerPanel>
             <MusicPlayer />
           </PlayerPanel>
