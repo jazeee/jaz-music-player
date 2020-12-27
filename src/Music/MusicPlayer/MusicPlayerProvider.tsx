@@ -1,5 +1,5 @@
 import constate from 'constate';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelectedMusicContext } from '../SelectedMusic';
 import { musicData } from '../data/data';
 import { CategoryType } from '../data/categories';
@@ -13,16 +13,6 @@ export enum PLAYER_STATE {
   PLAYING = 'Playing',
 }
 
-// function shuffle(items: Array<any>) {
-//   const count = items.length;
-//   for (let i = count - 1; i > 0; i--) {
-//     const j = Math.floor(Math.random() * i)
-//     const temp = items[i]
-//     items[i] = items[j]
-//     items[j] = temp
-//   }
-// }
-
 export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
   const { selectedIndices } = useSelectedMusicContext();
   const { selectedCategoryItem } = useCategoryItemsContext();
@@ -35,15 +25,18 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
 
   const ref = useRef<HTMLAudioElement | null>(null);
   const el = ref.current;
-  const playIndices = [...selectedIndices];
-  const playListLength = playIndices?.length ?? 1;
-  const currentMusicIndex = playIndices?.[nowPlayingIndex];
+  const playListMusicIndices = useMemo(() => {
+    return [...selectedIndices];
+  }, [selectedIndices]);
+  const playListLength = playListMusicIndices?.length ?? 1;
+
+  const currentMusicIndex = playListMusicIndices?.[nowPlayingIndex];
 
   const currentMusicDatum = musicData[currentMusicIndex];
   const currentFilePathSuffix = currentMusicDatum?.fileName;
   const currentFullFilePath = currentFilePathSuffix ? `${MUSIC_PREFIX_URL}/${currentFilePathSuffix}` : '';
 
-  const nextMusicIndex = playIndices?.[(nowPlayingIndex + 1) % (playListLength)];
+  const nextMusicIndex = playListMusicIndices?.[(nowPlayingIndex + 1) % (playListLength)];
   const nextMusicDatum = musicData[nextMusicIndex];
   const nextFilePathSuffix = nextMusicDatum?.fileName;
   const nextFullFilePath = nextFilePathSuffix ? `${MUSIC_PREFIX_URL}/${nextFilePathSuffix}` : '';
@@ -124,6 +117,7 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
     nowPlayingIndex,
     setNowPlayingIndex,
     playerState, setPlayerState,
+    playListMusicIndices,
     isLoading, setIsLoading,
     currentTime, setCurrentTime,
     playbackTime, setPlaybackTime,

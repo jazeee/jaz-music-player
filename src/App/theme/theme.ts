@@ -1,11 +1,14 @@
 import { createMuiTheme } from '@material-ui/core/styles';
-import { purple, orange } from '@material-ui/core/colors';
+import { purple, orange, yellow } from '@material-ui/core/colors';
 
-export const theme = createMuiTheme({
+export const baseTheme = createMuiTheme({
   palette: {
     mode: 'dark',
     primary: purple,
     secondary: orange,
+    text: {
+      secondary: yellow[500],
+    }
   },
   typography: {
     h1: {
@@ -27,6 +30,10 @@ export const theme = createMuiTheme({
       fontSize: "0.875rem"
     },
   },
+});
+
+export const theme = createMuiTheme({
+  ...baseTheme,
   components: {
     MuiTableRow: {
       styleOverrides: {

@@ -21,7 +21,7 @@ export function MusicCard(props: ListChildComponentProps) {
 
   return (
     <Wrapper style={{ ...style, backgroundColor }} onClick={() => {setNowPlayingIndex(index)}}>
-      <Typography variant="body1" noWrap>{description}</Typography>
+      <Typography variant="body1" noWrap color={isCurrentlyPlaying ? 'textSecondary' : undefined}>{description}</Typography>
     </Wrapper>
   )
 }

@@ -35,8 +35,8 @@ export function useLocalStorageState<T extends string | number>(paramName: strin
       });
     } else {
       setLocalStorage<T>(paramName, valueOrFunction);
+      setStateValue(valueOrFunction);
     }
-    setStateValue(valueOrFunction);
   }, [paramName]);
 
   return [value, setValue as Dispatch<SetStateAction<T>>];
