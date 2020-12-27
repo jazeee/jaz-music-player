@@ -2,14 +2,8 @@ import { Container, Grid, IconButton, LinearProgress, Slider, Typography } from 
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
-// import StopIcon from '@material-ui/icons/Stop';
 import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
 import { PLAYER_STATE, useMusicPlayerContext } from "./MusicPlayerProvider";
-
-// enum ORDER_STATE {
-//   REPEAT_ALL = 'Repeat All',
-//   SHUFFLE = 'Shuffle',
-// }
 
 function formatSecondsToMinutes(timeInSeconds: number) {
   const minute = Math.floor(timeInSeconds / 60);
@@ -21,9 +15,7 @@ export function MusicPlayer() {
   const {
     ref,
     currentFullFilePath,
-    currentMusicDatum,
     nextFullFilePath,
-    nextMusicDatum,
     goToNext,
     goToPrevious,
     setIsLoading,
