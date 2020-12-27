@@ -40,7 +40,7 @@ export function useCategoryItems(props: Props) {
       } else {
         newSelectedIndices = musicByCategory[selectedCategoryItem];
       }
-      newSelectedIndices = [...newSelectedIndices];
+      newSelectedIndices = [...(newSelectedIndices ?? [])];
       if (isShuffling) {
         shuffle(newSelectedIndices);
       }

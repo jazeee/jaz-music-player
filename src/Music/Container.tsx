@@ -12,15 +12,13 @@ const PlayerPanel = styled('div')({
 })
 
 const CategoryPanel = styled('div')({
-  minHeight: 160,
-  maxHeight: 480,
-  height: '40%',
   marginBottom: 16,
+  flex: 1,
   overflowY: 'auto',
 })
 
 const MusicPanel = styled('div')({
-  flex: 'auto',
+  flex: 1,
   overflowY: 'auto',
 })
 

@@ -93,12 +93,6 @@ export function MusicPlayer() {
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body1">Current: {currentMusicDatum?.description}</Typography>
-          </Grid>
-          <Grid item xs={6} >
-            <Typography variant="body2">Next Up: {nextMusicDatum?.description}</Typography>
-          </Grid>
         </Grid>
       </Container>
       {isLoading ?
