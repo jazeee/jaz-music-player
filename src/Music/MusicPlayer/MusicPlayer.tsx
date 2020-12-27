@@ -21,9 +21,9 @@ export function MusicPlayer() {
   const {
     ref,
     currentFullFilePath,
-    currentFilePathSuffix,
-    nextFilePathSuffix,
+    currentMusicDatum,
     nextFullFilePath,
+    nextMusicDatum,
     goToNext,
     goToPrevious,
     setIsLoading,
@@ -94,10 +94,10 @@ export function MusicPlayer() {
             </Grid>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body1">Current: {currentFilePathSuffix}</Typography>
+            <Typography variant="body1">Current: {currentMusicDatum?.description}</Typography>
           </Grid>
           <Grid item xs={6} >
-            <Typography variant="body2">Next Up: {nextFilePathSuffix}</Typography>
+            <Typography variant="body2">Next Up: {nextMusicDatum?.description}</Typography>
           </Grid>
         </Grid>
       </Container>

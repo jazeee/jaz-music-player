@@ -1,5 +1,6 @@
 interface MusicDatum {
   fileName: string;
+  description: string;
   tags: {
     album?: string;
     artist?: string;

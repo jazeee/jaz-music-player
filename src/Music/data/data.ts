@@ -13,7 +13,8 @@ export const ALL_INDICES: Array<number> = [];
 
 musicData.forEach((datum, index) => {
   const { tags } = datum;
-  const { artist = 'Unknown', album = 'Unknown', genre = 'Unknown' } = tags;
+  const { artist = 'Unknown', album = 'Unknown', genre = 'Unknown', title = 'Unknown' } = tags;
+  datum.description = `${artist ? artist + ": " : ''}${title}`;
   let { year } = tags;
   let decade = '-';
   if (year) {

@@ -13,10 +13,7 @@ export function MusicCard(props: ListChildComponentProps) {
   const { index, style } = props;
   const { music } = useSelectedMusicContext();
   const { nowPlayingIndex, setNowPlayingIndex } = useMusicPlayerContext();
-  const { tags: {
-    title,
-    artist,
-  } } = music[index];
+  const { description } = music[index];
 
   const { palette: { secondary } } = useTheme();
   const isCurrentlyPlaying = index === nowPlayingIndex;
@@ -24,7 +21,7 @@ export function MusicCard(props: ListChildComponentProps) {
 
   return (
     <Wrapper style={{ ...style, backgroundColor }} onClick={() => {setNowPlayingIndex(index)}}>
-      <Typography variant="body1">{artist ? `${artist}: `: ''}{title ?? 'Unknown'}</Typography>
+      <Typography variant="body1">{description}</Typography>
     </Wrapper>
   )
 }

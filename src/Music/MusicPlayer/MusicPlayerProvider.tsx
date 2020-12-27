@@ -32,10 +32,13 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
   if (previousMusicIndex < 0) {
     previousMusicIndex = playListLength - 1;
   }
-  const currentFilePathSuffix = musicData[currentMusicIndex]?.fileName;
+  const currentMusicDatum = musicData[currentMusicIndex];
+  const currentFilePathSuffix = currentMusicDatum?.fileName;
   const currentFullFilePath = currentFilePathSuffix ? `${MUSIC_PREFIX_URL}/${currentFilePathSuffix}` : '';
+
   const nextMusicIndex = playIndices?.[(nowPlayingIndex + 1) % (playListLength)];
-  const nextFilePathSuffix = musicData[nextMusicIndex]?.fileName;
+  const nextMusicDatum = musicData[nextMusicIndex];
+  const nextFilePathSuffix = nextMusicDatum?.fileName;
   const nextFullFilePath = nextFilePathSuffix ? `${MUSIC_PREFIX_URL}/${nextFilePathSuffix}` : '';
 
   const updatePlayer = useCallback(function (newPlayerState: PLAYER_STATE) {
@@ -108,9 +111,9 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
   return {
     ref,
     currentFullFilePath,
-    currentFilePathSuffix,
-    nextFilePathSuffix,
+    currentMusicDatum,
     nextFullFilePath,
+    nextMusicDatum,
     nowPlayingIndex,
     setNowPlayingIndex,
     playerState, setPlayerState,
