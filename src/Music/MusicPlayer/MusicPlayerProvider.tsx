@@ -28,10 +28,7 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
   const playIndices = [...selectedIndices];
   const playListLength = playIndices?.length ?? 1;
   const currentMusicIndex = playIndices?.[nowPlayingIndex];
-  let previousMusicIndex = playIndices?.[(nowPlayingIndex - 1) % (playListLength)];
-  if (previousMusicIndex < 0) {
-    previousMusicIndex = playListLength - 1;
-  }
+
   const currentMusicDatum = musicData[currentMusicIndex];
   const currentFilePathSuffix = currentMusicDatum?.fileName;
   const currentFullFilePath = currentFilePathSuffix ? `${MUSIC_PREFIX_URL}/${currentFilePathSuffix}` : '';
