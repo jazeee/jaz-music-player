@@ -11,15 +11,22 @@ import { SelectedMusicProvider } from "./SelectedMusic";
 const PlayerPanel = styled('div')({
 })
 
-const CategoryPanel = styled('div')({
-  marginBottom: 16,
-  flex: 1,
-  overflowY: 'auto',
-})
+const CategoryPanel = styled('div')(({theme}) => ({
+  borderBottom: "4px solid",
+  borderBottomColor: theme.palette.primary.main,
+  flex: "1 0",
+  // Flex doesn't shrink if element content size is bigger than shrunk size.
+  // use minHeight to force flex to shrink.
+  minHeight: 32,
+  overflowY: 'unset',
+}))
 
 const MusicPanel = styled('div')({
-  flex: 1,
-  overflowY: 'auto',
+  flex: "1 0",
+  // Flex doesn't shrink if element content size is bigger than shrunk size.
+  // use minHeight to force flex to shrink.
+  minHeight: 32,
+  overflowY: 'unset',
 })
 
 export function MusicContainer() {
