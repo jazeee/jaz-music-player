@@ -1,7 +1,11 @@
-import { Typography } from "@material-ui/core";
+import { Container, Typography } from "@material-ui/core";
+import { CategoryLinks } from "../FilterSidebar/CategoryLinks";
 
 export function Home() {
   return (
-    <Typography variant="h1">Pick From the Sidebar</Typography>
+    <Container>
+      <Typography variant="h1">Pick a Category</Typography>
+      <CategoryLinks />
+    </Container>
   )
 }

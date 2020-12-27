@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { CategoryResults } from "../Music/CategoryResults/CategoryResults";
 import { PATH_TO_CATEGORY } from "../Music/data/categories";
 import { MusicPlayer } from "../Music/MusicPlayer/MusicPlayer";
+import { CategoryItemsProvider } from "./CategoryResults/CategoryItemsProvider";
 import { MusicPicker } from "./MusicPicker/MusicPicker";
 import { MusicPlayerProvider } from "./MusicPlayer/MusicPlayerProvider";
 import { SelectedMusicProvider } from "./SelectedMusic";
@@ -29,17 +30,19 @@ export function MusicContainer() {
   return (
     <>
       <SelectedMusicProvider>
-        <MusicPlayerProvider categoryType={categoryType}>
-          <PlayerPanel>
-            <MusicPlayer />
-          </PlayerPanel>
-          <CategoryPanel>
-            <CategoryResults category={categoryType} />
-          </CategoryPanel>
-          <MusicPanel>
-            <MusicPicker />
-          </MusicPanel>
-        </MusicPlayerProvider>
+        <CategoryItemsProvider category={categoryType}>
+          <MusicPlayerProvider categoryType={categoryType}>
+            <PlayerPanel>
+              <MusicPlayer />
+            </PlayerPanel>
+            <CategoryPanel>
+              <CategoryResults />
+            </CategoryPanel>
+            <MusicPanel>
+              <MusicPicker />
+            </MusicPanel>
+          </MusicPlayerProvider>
+        </CategoryItemsProvider>
       </SelectedMusicProvider>
     </>
   )

@@ -11,7 +11,7 @@ export function MusicItems() {
   const { nowPlayingIndex } = useMusicPlayerContext();
 
   useEffect(() => {
-    listRef.current?.scrollToItem(nowPlayingIndex, 'center');
+    listRef.current?.scrollToItem(nowPlayingIndex);
   }, [nowPlayingIndex]);
   return (
     <AutoSizer>

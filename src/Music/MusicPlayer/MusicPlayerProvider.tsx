@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelectedMusicContext } from '../SelectedMusic';
 import { musicData } from '../data/data';
 import { CategoryType } from '../data/categories';
+import { useCategoryItemsContext } from '../CategoryResults/CategoryItemsProvider';
 
 const MUSIC_PREFIX_URL = process.env.REACT_APP_MUSIC_SRC ?? '/music';
 
@@ -14,6 +15,7 @@ export enum PLAYER_STATE {
 
 export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
   const { selectedIndices } = useSelectedMusicContext();
+  const { selectedCategoryItem } = useCategoryItemsContext();
   const [nowPlayingIndex, setNowPlayingIndex] = useState(0);
   const [playerState, setPlayerState] = useState<PLAYER_STATE>(PLAYER_STATE.UNSET);
   const [isLoading, setIsLoading] = useState(false);
@@ -80,13 +82,13 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
       if (playerState !== PLAYER_STATE.PLAYING) {
         playerState = PLAYER_STATE.PLAYING;
       }
-      if (!categoryType) {
+      if (!selectedCategoryItem) {
         playerState = PLAYER_STATE.PAUSED;
       }
       updatePlayer(playerState);
       return playerState;
     });
-  }, [categoryType, updatePlayer]);
+  }, [selectedCategoryItem, updatePlayer]);
 
   function goToPrevious() {
     setNowPlayingIndex(index => {
