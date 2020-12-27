@@ -5,7 +5,7 @@ import { musicData } from '../data/data';
 import { CategoryType } from '../data/categories';
 import { useCategoryItemsContext } from '../CategoryResults/CategoryItemsProvider';
 
-const MUSIC_PREFIX_URL = process.env.REACT_APP_MUSIC_SRC ?? '/music';
+const MUSIC_PREFIX_URL = process.env.REACT_APP_MUSIC_SRC ?? '/data/music';
 
 export enum PLAYER_STATE {
   UNSET = 'Unset',
