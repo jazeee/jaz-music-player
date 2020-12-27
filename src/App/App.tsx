@@ -11,9 +11,11 @@ export function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/music" element={<Layout />} >
-            <Route path=":category" element={<MusicContainer />} />
+          <Route path="/" element={<Layout />} >
+            <Route path="" element={<Home />} />
+            <Route path="music" >
+              <Route path=":category" element={<MusicContainer />} />
+            </Route>
           </Route>
         </Routes>
       </ThemeProvider>
