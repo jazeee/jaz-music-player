@@ -19,7 +19,9 @@ export function CategoryRow(props: ListChildComponentProps) {
 
   return (
     <Wrapper style={{ ...style, backgroundColor }} onClick={() => { onSelectItem(item) }}>
-      <Typography variant={isSelected ? "body1" : "body2"}>{isSelected && <span>&gt; </span>}{item === ALL_KEY ? 'All' : item}</Typography>
+      <Typography variant={isSelected ? "body1" : "body2"} noWrap>
+        {isSelected && <span>&gt; </span>}{item === ALL_KEY ? 'All' : item
+      }</Typography>
     </Wrapper>
   )
 }
