@@ -2,8 +2,11 @@ import { Container, Grid, IconButton, LinearProgress, Slider, Typography } from 
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
+import VolumeIcon from '@material-ui/icons/VolumeUpRounded';
 import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
 import { PLAYER_STATE, useMusicPlayerContext } from "./MusicPlayerProvider";
+import React, { useState } from "react";
+import { VolumeDialog } from "./components/VolumeDialog";
 
 function formatSecondsToMinutes(timeInSeconds: number) {
   const minute = Math.floor(timeInSeconds / 60);
@@ -29,6 +32,7 @@ export function MusicPlayer() {
     volume,
     setVolume,
   } = useMusicPlayerContext();
+  const [volumeSelectIsVisible, setVolumeSelectIsVisible] = useState(false);
 
   return (
     <>
@@ -52,41 +56,42 @@ export function MusicPlayer() {
             }}
           />
         }
-        {Boolean(nextFullFilePath) &&
-          // Cache next file
-          <audio src={nextFullFilePath} />
-        }
-        <Grid container spacing={1}>
-          <Grid item xs={12}>
-            <Grid container spacing={1}>
-              <Grid item xs={12} sm={4}>
-                <IconButton onClick={goToPrevious}><SkipPreviousIcon /></IconButton>
-                {playerState !== PLAYER_STATE.PLAYING ?
-                  <IconButton color="secondary" onClick={() => { setPlayerState(PLAYER_STATE.PLAYING) }}><PlayCircleFilledIcon /></IconButton> :
-                  <IconButton color="secondary" onClick={() => { setPlayerState(PLAYER_STATE.PAUSED) }}><PauseCircleFilledIcon /></IconButton>
+      </Container>
+      {Boolean(nextFullFilePath) &&
+        // Cache next file
+        <audio src={nextFullFilePath} />
+      }
+      <Grid container spacing={0}>
+        <Grid item xs={12}>
+          <Grid container spacing={0} >
+            <Grid item xs={8}>
+              <IconButton onClick={goToPrevious}><SkipPreviousIcon /></IconButton>
+              {playerState !== PLAYER_STATE.PLAYING ?
+                <IconButton color="secondary" onClick={() => { setPlayerState(PLAYER_STATE.PLAYING) }}><PlayCircleFilledIcon /></IconButton> :
+                <IconButton color="secondary" onClick={() => { setPlayerState(PLAYER_STATE.PAUSED) }}><PauseCircleFilledIcon /></IconButton>
+              }
+              <IconButton onClick={goToNext}><SkipNextIcon /></IconButton>
+              <IconButton onClick={() => setVolumeSelectIsVisible(true)}><VolumeIcon /></IconButton>
+            </Grid>
+            <Grid item xs={4}>
+              <Typography variant="body2" >
+                {Boolean(playbackTime) && <span>{formatSecondsToMinutes(currentTime)} / {formatSecondsToMinutes(playbackTime)}</span>}</Typography>
+              <Slider
+                value={currentTime}
+                max={playbackTime}
+                onChange={(__event, time) => {
+                if (ref.current && playbackTime) {
+                  time = Math.min(playbackTime, Math.max(0, time as number));
+                  ref.current.currentTime = time;
                 }
-                <IconButton onClick={goToNext}><SkipNextIcon /></IconButton>
-              </Grid>
-              <Grid item xs={6} sm={4}>
-                <Typography variant="body1">
-                  Progress {Boolean(playbackTime) && <span>{formatSecondsToMinutes(currentTime)} / {formatSecondsToMinutes(playbackTime)}</span>}</Typography>
-                <Slider value={currentTime} max={playbackTime} onChange={(__event, time) => {
-                  if (ref.current && playbackTime) {
-                    time = Math.min(playbackTime, Math.max(0, time as number));
-                    ref.current.currentTime = time;
-                  }
-                }} />
-              </Grid>
-              <Grid item xs={6} sm={4}>
-                <Typography variant="body1">Volume</Typography>
-                <Slider value={volume} max={1.0} step={0.01} onChange={(__event, newVolume) => {
-                  setVolume(newVolume as number)
-                }} />
-              </Grid>
+              }} />
             </Grid>
           </Grid>
         </Grid>
-      </Container>
+      </Grid>
+      {volumeSelectIsVisible && (
+        <VolumeDialog setIsVisible={setVolumeSelectIsVisible} />
+      )}
       {isLoading ?
         <LinearProgress />
         :
