@@ -18,3 +18,9 @@ Launches the test runner in the interactive watch mode.
 
 Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
+
+# Setup nginx config
+
+This app is designed to run with a separate http server providing media, such as nginx
+
+See example `./nginx.conf`
