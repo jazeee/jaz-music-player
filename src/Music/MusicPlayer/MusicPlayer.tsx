@@ -10,7 +10,7 @@ import { VolumeDialog } from "./components/VolumeDialog";
 
 const MusicProgress = styled(Slider)({
   padding: "0 !important",
-  height: 6,
+  height: "6px !important",
 });
 
 function formatSecondsToMinutes(timeInSeconds: number) {
