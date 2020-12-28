@@ -18,7 +18,6 @@ export function MusicPlayer() {
   const {
     ref,
     currentFullFilePath,
-    nextFullFilePath,
     goToNext,
     goToPrevious,
     setIsLoading,
@@ -57,25 +56,22 @@ export function MusicPlayer() {
           />
         }
       </Container>
-      {Boolean(nextFullFilePath) &&
-        // Cache next file
-        <audio src={nextFullFilePath} />
-      }
-      <Grid container spacing={0}>
-        <Grid item xs={12}>
-          <Grid container spacing={0} >
-            <Grid item xs={8}>
-              <IconButton onClick={goToPrevious}><SkipPreviousIcon /></IconButton>
-              {playerState !== PLAYER_STATE.PLAYING ?
-                <IconButton color="secondary" onClick={() => { setPlayerState(PLAYER_STATE.PLAYING) }}><PlayCircleFilledIcon /></IconButton> :
-                <IconButton color="secondary" onClick={() => { setPlayerState(PLAYER_STATE.PAUSED) }}><PauseCircleFilledIcon /></IconButton>
-              }
-              <IconButton onClick={goToNext}><SkipNextIcon /></IconButton>
-              <IconButton onClick={() => setVolumeSelectIsVisible(true)}><VolumeIcon /></IconButton>
-            </Grid>
-            <Grid item xs={4}>
+      <Grid container spacing={0} justifyContent="space-around">
+        <Grid item xs={8}>
+          <IconButton onClick={goToPrevious}><SkipPreviousIcon /></IconButton>
+          {playerState !== PLAYER_STATE.PLAYING ?
+            <IconButton color="secondary" onClick={() => { setPlayerState(PLAYER_STATE.PLAYING) }}><PlayCircleFilledIcon /></IconButton> :
+            <IconButton color="secondary" onClick={() => { setPlayerState(PLAYER_STATE.PAUSED) }}><PauseCircleFilledIcon /></IconButton>
+          }
+          <IconButton onClick={goToNext}><SkipNextIcon /></IconButton>
+          <IconButton onClick={() => setVolumeSelectIsVisible(true)}><VolumeIcon /></IconButton>
+        </Grid>
+        <Grid item xs={4}>
+          {Boolean(playbackTime) && (
+            <>
               <Typography variant="body2" >
-                {Boolean(playbackTime) && <span>{formatSecondsToMinutes(currentTime)} / {formatSecondsToMinutes(playbackTime)}</span>}</Typography>
+                {formatSecondsToMinutes(currentTime)} / {formatSecondsToMinutes(playbackTime)}
+              </Typography>
               <Slider
                 value={currentTime}
                 max={playbackTime}
@@ -85,8 +81,8 @@ export function MusicPlayer() {
                   ref.current.currentTime = time;
                 }
               }} />
-            </Grid>
-          </Grid>
+            </>
+          )}
         </Grid>
       </Grid>
       {volumeSelectIsVisible && (
