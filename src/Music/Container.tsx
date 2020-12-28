@@ -4,6 +4,7 @@ import { CategoryResults } from "../Music/CategoryResults/CategoryResults";
 import { PATH_TO_CATEGORY } from "../Music/data/categories";
 import { MusicPlayer } from "../Music/MusicPlayer/MusicPlayer";
 import { CategoryItemsProvider } from "./CategoryResults/CategoryItemsProvider";
+import { MusicProgressBar } from "./components/MusicProgressBar";
 import { MusicPicker } from "./MusicPicker/MusicPicker";
 import { MusicPlayerProvider } from "./MusicPlayer/MusicPlayerProvider";
 import { SelectedMusicProvider } from "./SelectedMusic";
@@ -12,8 +13,6 @@ const PlayerPanel = styled('div')({
 })
 
 const CategoryPanel = styled('div')(({theme}) => ({
-  borderBottom: "4px solid",
-  borderBottomColor: theme.palette.primary.main,
   flex: "1 0",
   // Flex doesn't shrink if element content size is bigger than shrunk size.
   // use minHeight to force flex to shrink.
@@ -43,6 +42,7 @@ export function MusicContainer() {
             <CategoryPanel>
               <CategoryResults />
             </CategoryPanel>
+            <MusicProgressBar />
             <MusicPanel>
               <MusicPicker />
             </MusicPanel>

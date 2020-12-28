@@ -1,4 +1,4 @@
-import { Container, Grid, IconButton, LinearProgress, Slider, Typography } from "@material-ui/core";
+import { Container, Grid, IconButton, Slider, Typography } from "@material-ui/core";
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
@@ -21,7 +21,6 @@ export function MusicPlayer() {
     goToNext,
     goToPrevious,
     setIsLoading,
-    isLoading,
     playbackTime,
     setPlaybackTime,
     currentTime,
@@ -56,43 +55,42 @@ export function MusicPlayer() {
           />
         }
       </Container>
-      <Grid container spacing={0} justifyContent="space-around">
-        <Grid item xs={8}>
-          <IconButton onClick={goToPrevious}><SkipPreviousIcon /></IconButton>
-          {playerState !== PLAYER_STATE.PLAYING ?
-            <IconButton color="secondary" onClick={() => { setPlayerState(PLAYER_STATE.PLAYING) }}><PlayCircleFilledIcon /></IconButton> :
-            <IconButton color="secondary" onClick={() => { setPlayerState(PLAYER_STATE.PAUSED) }}><PauseCircleFilledIcon /></IconButton>
-          }
-          <IconButton onClick={goToNext}><SkipNextIcon /></IconButton>
-          <IconButton onClick={() => setVolumeSelectIsVisible(true)}><VolumeIcon /></IconButton>
+      <Grid container spacing={0} alignItems="center">
+        <Grid item xs>
+          <Grid container spacing={0} justifyContent="center">
+            <IconButton onClick={goToPrevious}><SkipPreviousIcon /></IconButton>
+            {playerState !== PLAYER_STATE.PLAYING ?
+              <IconButton color="secondary" onClick={() => { setPlayerState(PLAYER_STATE.PLAYING) }}><PlayCircleFilledIcon /></IconButton> :
+              <IconButton color="secondary" onClick={() => { setPlayerState(PLAYER_STATE.PAUSED) }}><PauseCircleFilledIcon /></IconButton>
+            }
+            <IconButton onClick={goToNext}><SkipNextIcon /></IconButton>
+            <IconButton onClick={() => setVolumeSelectIsVisible(true)}><VolumeIcon /></IconButton>
+          </Grid>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           {Boolean(playbackTime) && (
             <>
               <Typography variant="body2" >
                 {formatSecondsToMinutes(currentTime)} / {formatSecondsToMinutes(playbackTime)}
               </Typography>
-              <Slider
-                value={currentTime}
-                max={playbackTime}
-                onChange={(__event, time) => {
-                if (ref.current && playbackTime) {
-                  time = Math.min(playbackTime, Math.max(0, time as number));
-                  ref.current.currentTime = time;
-                }
-              }} />
             </>
           )}
         </Grid>
       </Grid>
+      <Container>
+        <Slider
+          value={currentTime}
+          max={playbackTime}
+          onChange={(__event, time) => {
+            if (ref.current && playbackTime) {
+              time = Math.min(playbackTime, Math.max(0, time as number));
+              ref.current.currentTime = time;
+            }
+          }} />
+      </Container>
       {volumeSelectIsVisible && (
         <VolumeDialog setIsVisible={setVolumeSelectIsVisible} />
       )}
-      {isLoading ?
-        <LinearProgress />
-        :
-        <LinearProgress variant="determinate" value={currentTime > 0 && playbackTime > 0 ? (100 * currentTime / playbackTime) : 0} />
-      }
     </>
   )
 }

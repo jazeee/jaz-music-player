@@ -42,7 +42,7 @@ export function NavBar(props: Props) {
           <FormGroup>
             <FormControlLabel
               control={<Switch checked={isShuffling} onChange={() => {setIsShuffling(value => !value)}} aria-label="shuffle switch" />}
-              label="Enable Shuffling"
+              label="Shuffle"
             />
           </FormGroup>
         </Toolbar>

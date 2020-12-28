@@ -23,4 +23,4 @@ It correctly bundles React in production mode and optimizes the build for the be
 
 This app is designed to run with a separate http server providing media, such as nginx
 
-See example `./nginx.conf`
+See example `./nginx-sample.conf`
