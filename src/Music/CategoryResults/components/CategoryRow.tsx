@@ -1,11 +1,13 @@
 import { styled, Typography, useTheme } from "@material-ui/core";
 import { ListChildComponentProps } from 'react-window';
+import { ROW_HEIGHT_IN_PX } from "../../constants";
 import { ALL_KEY, useCategoryItemsContext } from "../CategoryItemsProvider";
 
 const Wrapper = styled('div')({
   paddingLeft: 16,
   paddingRight: 16,
   cursor: 'pointer',
+  lineHeight: ROW_HEIGHT_IN_PX,
 });
 
 export function CategoryRow(props: ListChildComponentProps) {

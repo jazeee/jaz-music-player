@@ -1,0 +1,1 @@
+export const ROW_HEIGHT_IN_PX = 32;

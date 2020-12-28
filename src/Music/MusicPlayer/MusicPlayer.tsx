@@ -1,4 +1,4 @@
-import { Container, Grid, IconButton, Slider, Typography } from "@material-ui/core";
+import { CircularProgress, Container, Grid, IconButton, Slider, styled, Typography } from "@material-ui/core";
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
@@ -7,6 +7,11 @@ import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
 import { PLAYER_STATE, useMusicPlayerContext } from "./MusicPlayerProvider";
 import React, { useState } from "react";
 import { VolumeDialog } from "./components/VolumeDialog";
+
+const MusicProgress = styled(Slider)({
+  padding: "0 !important",
+  height: 6,
+});
 
 function formatSecondsToMinutes(timeInSeconds: number) {
   const minute = Math.floor(timeInSeconds / 60);
@@ -20,6 +25,7 @@ export function MusicPlayer() {
     currentFullFilePath,
     goToNext,
     goToPrevious,
+    isLoading,
     setIsLoading,
     playbackTime,
     setPlaybackTime,
@@ -68,6 +74,7 @@ export function MusicPlayer() {
           </Grid>
         </Grid>
         <Grid item xs={3}>
+          {isLoading && <CircularProgress />}
           {Boolean(playbackTime) && (
             <>
               <Typography variant="body2" >
@@ -78,7 +85,7 @@ export function MusicPlayer() {
         </Grid>
       </Grid>
       <Container>
-        <Slider
+        <MusicProgress
           value={currentTime}
           max={playbackTime}
           onChange={(__event, time) => {

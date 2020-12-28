@@ -4,7 +4,6 @@ import { CategoryResults } from "../Music/CategoryResults/CategoryResults";
 import { PATH_TO_CATEGORY } from "../Music/data/categories";
 import { MusicPlayer } from "../Music/MusicPlayer/MusicPlayer";
 import { CategoryItemsProvider } from "./CategoryResults/CategoryItemsProvider";
-import { MusicProgressBar } from "./components/MusicProgressBar";
 import { MusicPicker } from "./MusicPicker/MusicPicker";
 import { MusicPlayerProvider } from "./MusicPlayer/MusicPlayerProvider";
 import { SelectedMusicProvider } from "./SelectedMusic";
@@ -19,6 +18,10 @@ const CategoryPanel = styled('div')(({theme}) => ({
   minHeight: 32,
   overflowY: 'unset',
 }))
+
+const Divider = styled('div')(({ theme }) => ({
+  margin: '0 32px',
+}));
 
 const MusicPanel = styled('div')({
   flex: "1 0",
@@ -42,7 +45,9 @@ export function MusicContainer() {
             <CategoryPanel>
               <CategoryResults />
             </CategoryPanel>
-            <MusicProgressBar />
+            <Divider>
+              <hr />
+            </Divider>
             <MusicPanel>
               <MusicPicker />
             </MusicPanel>

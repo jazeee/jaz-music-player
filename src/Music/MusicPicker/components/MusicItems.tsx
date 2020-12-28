@@ -3,6 +3,7 @@ import { MusicCard } from "./MusicCard";
 import { FixedSizeList } from 'react-window';
 import { useMusicPlayerContext } from "../../MusicPlayer/MusicPlayerProvider";
 import { useEffect, useRef } from "react";
+import { ROW_HEIGHT_IN_PX } from "../../constants";
 
 interface Props {
   width: number;
@@ -24,7 +25,7 @@ export function MusicItems(props: Props) {
       ref={listRef}
       height={height}
       itemCount={music.length}
-      itemSize={24}
+      itemSize={ROW_HEIGHT_IN_PX}
       width={width}
     >
       {MusicCard}

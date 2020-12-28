@@ -2,11 +2,13 @@ import { styled, Typography, useTheme } from "@material-ui/core";
 import { useSelectedMusicContext } from "../../SelectedMusic";
 import { useMusicPlayerContext } from "../../MusicPlayer/MusicPlayerProvider";
 import { ListChildComponentProps } from 'react-window';
+import { ROW_HEIGHT_IN_PX } from "../../constants";
 
 const Wrapper = styled('div')({
   paddingLeft: 16,
   paddingRight: 16,
   cursor: 'pointer',
+  lineHeight: ROW_HEIGHT_IN_PX,
 });
 
 export function MusicCard(props: ListChildComponentProps) {

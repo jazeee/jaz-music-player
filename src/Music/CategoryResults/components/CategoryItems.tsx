@@ -2,6 +2,7 @@ import { FixedSizeList } from 'react-window';
 import { useEffect, useRef } from "react";
 import { CategoryRow } from "./CategoryRow";
 import { useCategoryItemsContext } from '../CategoryItemsProvider';
+import { ROW_HEIGHT_IN_PX } from '../../constants';
 
 interface Props {
   width: number;
@@ -23,7 +24,7 @@ export function CategoryItems(props: Props) {
       ref={listRef}
       height={height}
       itemCount={availableItems.length}
-      itemSize={24}
+      itemSize={ROW_HEIGHT_IN_PX}
       width={width}
     >
       {CategoryRow}
