@@ -11,6 +11,10 @@ const Wrapper = styled('div')({
   lineHeight: ROW_HEIGHT_IN_PX,
 });
 
+const Text = styled(Typography)({
+  lineHeight: `${ROW_HEIGHT_IN_PX}px`,
+});
+
 export function MusicCard(props: ListChildComponentProps) {
   const { index, style } = props;
   const { music } = useSelectedMusicContext();
@@ -23,7 +27,7 @@ export function MusicCard(props: ListChildComponentProps) {
 
   return (
     <Wrapper style={{ ...style, backgroundColor }} onClick={() => {setNowPlayingIndex(index)}}>
-      <Typography variant="body1" noWrap color={isCurrentlyPlaying ? 'textSecondary' : undefined}>{description}</Typography>
+      <Text variant="body1" noWrap color={isCurrentlyPlaying ? 'textSecondary' : undefined}>{description}</Text>
     </Wrapper>
   )
 }

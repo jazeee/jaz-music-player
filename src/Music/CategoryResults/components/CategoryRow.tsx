@@ -10,6 +10,10 @@ const Wrapper = styled('div')({
   lineHeight: ROW_HEIGHT_IN_PX,
 });
 
+const Text = styled(Typography)({
+  lineHeight: `${ROW_HEIGHT_IN_PX}px`,
+});
+
 export function CategoryRow(props: ListChildComponentProps) {
   const { index, style } = props;
   const { selectedIndex, onSelectItem, availableItems } = useCategoryItemsContext();
@@ -21,9 +25,9 @@ export function CategoryRow(props: ListChildComponentProps) {
 
   return (
     <Wrapper style={{ ...style, backgroundColor }} onClick={() => { onSelectItem(item) }}>
-      <Typography variant={isSelected ? "body1" : "body2"} noWrap color={isSelected ? 'textSecondary' : undefined}>
+      <Text variant={isSelected ? "body1" : "body2"} noWrap color={isSelected ? 'textSecondary' : undefined}>
         {item === ALL_KEY ? 'All' : item}
-      </Typography>
+      </Text>
     </Wrapper>
   )
 }
