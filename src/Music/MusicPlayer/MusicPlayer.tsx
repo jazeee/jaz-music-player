@@ -21,7 +21,8 @@ function formatSecondsToMinutes(timeInSeconds: number) {
 
 export function MusicPlayer() {
   const {
-    ref,
+    audioElement,
+    setAudioElement,
     currentFullFilePath,
     goToNext,
     goToPrevious,
@@ -42,20 +43,20 @@ export function MusicPlayer() {
     <>
       <Container>
         {Boolean(currentFullFilePath) &&
-          <audio ref={ref} src={currentFullFilePath} onEnded={goToNext} onWaiting={() => { setIsLoading(true) }} onPlaying={() => { setIsLoading(false) }} onTimeUpdate={() => {
-            setPlaybackTime(ref.current?.duration ?? 0);
-            setCurrentTime(ref.current?.currentTime ?? 0);
+          <audio ref={setAudioElement} src={currentFullFilePath} onEnded={goToNext} onWaiting={() => { setIsLoading(true) }} onPlaying={() => { setIsLoading(false) }} onTimeUpdate={() => {
+            setPlaybackTime(audioElement?.duration ?? 0);
+            setCurrentTime(audioElement?.currentTime ?? 0);
           }}
             onPlay={() => {
-              if (ref.current) {
-                ref.current.volume = volume
+              if (audioElement) {
+                audioElement.volume = volume
               }
               setPlayerState(PLAYER_STATE.PLAYING)
             }}
             onPause={() => setPlayerState(PLAYER_STATE.PAUSED)}
             onVolumeChange={() => {
-              if (ref.current) {
-                setVolume(ref.current.volume);
+              if (audioElement) {
+                setVolume(audioElement.volume);
               }
             }}
           />
@@ -89,9 +90,9 @@ export function MusicPlayer() {
           value={currentTime}
           max={playbackTime}
           onChange={(__event, time) => {
-            if (ref.current && playbackTime) {
+            if (audioElement && playbackTime) {
               time = Math.min(playbackTime, Math.max(0, time as number));
-              ref.current.currentTime = time;
+              audioElement.currentTime = time;
             }
           }} />
       </Container>

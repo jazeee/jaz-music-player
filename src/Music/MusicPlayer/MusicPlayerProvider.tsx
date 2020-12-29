@@ -1,5 +1,5 @@
 import constate from 'constate';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelectedMusicContext } from '../SelectedMusic';
 import { musicData } from '../data/data';
 import { CategoryType } from '../data/categories';
@@ -22,9 +22,9 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
   const [currentTime, setCurrentTime] = useState(0)
   const [playbackTime, setPlaybackTime] = useState(0)
   const [volume, setVolume] = useState(0.5);
+  const [error, setError] = useState('');
 
-  const ref = useRef<HTMLAudioElement | null>(null);
-  const el = ref.current;
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>();
   const playListMusicIndices = useMemo(() => {
     return [...selectedIndices];
   }, [selectedIndices]);
@@ -42,28 +42,36 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
   const nextFullFilePath = nextFilePathSuffix ? `${MUSIC_PREFIX_URL}/${nextFilePathSuffix}` : '';
 
   const updatePlayer = useCallback(function (newPlayerState: PLAYER_STATE) {
-    if (!el) {
+    if (!audioElement) {
       return;
     }
+    audioElement.preload = 'auto';
     switch (newPlayerState) {
       case PLAYER_STATE.PLAYING:
-        el.play().catch(console.error)
+        audioElement.play().catch((error) => {
+          updatePlayer(PLAYER_STATE.PAUSED);
+          console.error(error);
+          setError(error.message);
+          setTimeout(() => {
+            updatePlayer(PLAYER_STATE.PLAYING);
+          }, 1000);
+        })
         break;
       case PLAYER_STATE.PAUSED:
-        el.pause()
+        audioElement.pause()
         break;
       case PLAYER_STATE.UNSET:
         break;
       default:
         throw new Error(`Unexpected playerState: ${newPlayerState}`);
     }
-  }, [el]);
+  }, [audioElement]);
 
   useEffect(() => {
-    if (ref.current) {
-      ref.current.volume = volume;
+    if (audioElement) {
+      audioElement.volume = volume;
     }
-  }, [el, volume]);
+  }, [audioElement, volume]);
 
   useEffect(() => {
     updatePlayer(playerState);
@@ -109,7 +117,8 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
   }
 
   return {
-    ref,
+    audioElement,
+    setAudioElement,
     currentFullFilePath,
     currentMusicDatum,
     nextFullFilePath,
@@ -124,6 +133,7 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
     volume, setVolume,
     goToPrevious,
     goToNext,
+    error,
   }
 }
 
