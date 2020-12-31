@@ -1,4 +1,4 @@
-import { CircularProgress, Container, Grid, IconButton, Slider, styled, Typography } from "@material-ui/core";
+import { LinearProgress, Container, Grid, IconButton, Slider, styled, Typography } from "@material-ui/core";
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
@@ -31,6 +31,7 @@ export function MusicPlayer() {
     setIsLoading,
     playbackTime,
     setPlaybackTime,
+    currentMusicDatum,
     currentTime,
     setCurrentTime,
     playerState,
@@ -39,6 +40,7 @@ export function MusicPlayer() {
     setVolume,
   } = useMusicPlayerContext();
   const [volumeSelectIsVisible, setVolumeSelectIsVisible] = useState(false);
+  const displayedTime = Number.isFinite(playbackTime) ? playbackTime : Number(currentMusicDatum.durationInSeconds);
 
   return (
     <>
@@ -79,23 +81,23 @@ export function MusicPlayer() {
           </Grid>
         </Grid>
         <Grid item xs={3}>
-          {isLoading && <CircularProgress />}
-          {Boolean(playbackTime) && (
+          {Boolean(displayedTime) && (
             <>
               <Typography variant="body2" >
-                {formatSecondsToMinutes(currentTime)} / {formatSecondsToMinutes(playbackTime)}
+                {formatSecondsToMinutes(currentTime)} / {formatSecondsToMinutes(displayedTime)}
               </Typography>
             </>
           )}
+          {isLoading && <LinearProgress />}
         </Grid>
       </Grid>
       <Container>
         <MusicProgress
           value={currentTime}
-          max={playbackTime}
+          max={displayedTime}
           onChange={(__event, time) => {
-            if (audioElement && playbackTime) {
-              time = Math.min(playbackTime, Math.max(0, time as number));
+            if (audioElement && displayedTime) {
+              time = Math.min(displayedTime, Math.max(0, time as number));
               audioElement.currentTime = time;
             }
           }} />
