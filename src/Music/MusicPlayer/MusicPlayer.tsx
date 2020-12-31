@@ -23,6 +23,7 @@ export function MusicPlayer() {
   const {
     audioElement,
     setAudioElement,
+    mediaSourceObjectUrl,
     currentFullFilePath,
     goToNext,
     goToPrevious,
@@ -43,10 +44,13 @@ export function MusicPlayer() {
     <>
       <Container>
         {Boolean(currentFullFilePath) &&
-          <audio ref={setAudioElement} src={currentFullFilePath} onEnded={goToNext} onWaiting={() => { setIsLoading(true) }} onPlaying={() => { setIsLoading(false) }} onTimeUpdate={() => {
-            setPlaybackTime(audioElement?.duration ?? 0);
-            setCurrentTime(audioElement?.currentTime ?? 0);
-          }}
+          <audio ref={setAudioElement} src={mediaSourceObjectUrl} onEnded={goToNext} onWaiting={() => { setIsLoading(true) }}
+            onError={() => {setIsLoading(false)}}
+            onPlaying={() => { setIsLoading(false) }}
+            onTimeUpdate={() => {
+              setPlaybackTime(audioElement?.duration ?? 0);
+              setCurrentTime(audioElement?.currentTime ?? 0);
+            }}
             onPlay={() => {
               if (audioElement) {
                 audioElement.volume = volume

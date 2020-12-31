@@ -4,6 +4,7 @@ import { useSelectedMusicContext } from '../SelectedMusic';
 import { musicData } from '../data/data';
 import { CategoryType } from '../data/categories';
 import { useCategoryItemsContext } from '../CategoryResults/CategoryItemsProvider';
+import { createMediaSource } from './mediaSource';
 
 const MUSIC_PREFIX_URL = process.env.REACT_APP_MUSIC_SRC ?? '/data/music';
 
@@ -25,6 +26,7 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
   const [error, setError] = useState('');
 
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>();
+  const [mediaSourceObjectUrl, setMediaSourceObjectUrl] = useState<string>('');
   const playListMusicIndices = useMemo(() => {
     return [...selectedIndices];
   }, [selectedIndices]);
@@ -52,9 +54,6 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
           updatePlayer(PLAYER_STATE.PAUSED);
           console.error(error);
           setError(error.message);
-          setTimeout(() => {
-            updatePlayer(PLAYER_STATE.PLAYING);
-          }, 1000);
         })
         break;
       case PLAYER_STATE.PAUSED:
@@ -78,13 +77,27 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
   }, [updatePlayer, playerState])
 
   useEffect(() => {
-    setPlayerState(playerState => {
-      if (playerState !== PLAYER_STATE.UNSET) {
-        playerState = currentFullFilePath ? PLAYER_STATE.PLAYING : PLAYER_STATE.PAUSED;
-      }
-      updatePlayer(playerState);
-      return playerState;
-    });
+    let currentInterval: NodeJS.Timeout;
+    if (currentFullFilePath) {
+      createMediaSource(currentFullFilePath).then(({ mediaSource, bufferLatch, clearHead}) => {
+        setPlayerState(PLAYER_STATE.PAUSED);
+        setMediaSourceObjectUrl(URL.createObjectURL(mediaSource));
+        bufferLatch.waitFor().then(() => {
+          setPlayerState(playerState => {
+            if (playerState !== PLAYER_STATE.UNSET) {
+              playerState = currentFullFilePath ? PLAYER_STATE.PLAYING : PLAYER_STATE.PAUSED;
+            }
+            return playerState;
+          });
+        })
+        if (typeof clearHead === 'function') {
+          currentInterval = setInterval(() => clearHead(15), 20 * 1000);
+        }
+      })
+    }
+    return () => {
+      clearInterval(currentInterval);
+    }
   }, [currentFullFilePath, updatePlayer]);
 
   useEffect(() => {
@@ -118,6 +131,7 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
 
   return {
     audioElement,
+    mediaSourceObjectUrl,
     setAudioElement,
     currentFullFilePath,
     currentMusicDatum,
