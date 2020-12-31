@@ -1,69 +1,38 @@
+import { ResettingCountDownLatch } from "../../utils/ResettingCountDownLatch";
+
 export async function getStream(sourcePath: string): Promise<ReadableStream<Uint8Array>> {
   const response = await fetch(sourcePath);
   if (!response.body) {
     throw new Error('API responded with no body');
   }
-  const reader = response.body.getReader();
-  const readableStream = new ReadableStream({
-    async start(controller) {
-      while (true) {
-        const { done, value } = await reader.read();
+  // const reader = response.body.getReader();
+  // reader.
+  // const readableStream = new ReadableStream({
+  //   async start(controller) {
+  //     while (true) {
+  //       const { done, value } = await reader.read();
 
-        // When no more data needs to be consumed, break the reading
-        if (done) {
-          console.log('done in readableStream');
-          break;
-        }
+  //       // When no more data needs to be consumed, break the reading
+  //       if (done) {
+  //         console.log('done in readableStream');
+  //         break;
+  //       }
 
-        // Enqueue the next data chunk into our target stream
-        controller.enqueue(value);
-      }
-      controller.close();
-      reader.releaseLock();
-    }
-  });
-  return readableStream;
+  //       // Enqueue the next data chunk into our target stream
+  //       controller.enqueue(value);
+  //     }
+  //     controller.close();
+  //     reader.releaseLock();
+  //   }
+  // });
+  return response.body;
 }
 
 // let filePath = `/Black%20Sheep/A%20Wolf%20in%20Sheep's%20Clothing/09%20Similak%20Child.mp3`;
 // // filePath = 'http://localhost:4242/Genesis/Genesis/08 Silver Rainbow.mp3'
 // filePath = 'http://localhost:4242/Jethro Tull/A Little Light Music/05 Rocks on the Road.mp3'
 
-class ResettingCountDownLatch {
-  initialCount: number;
-  currentCount: number;
-  resolver?: (value: boolean | PromiseLike<boolean>) => void;
-  promise?: Promise<boolean>;
-
-  constructor(initialCount = 1) {
-    if (initialCount < 1) {
-      throw new Error(`Initial count must be at least 1, not ${initialCount}`);
-    }
-    this.initialCount = initialCount;
-    this.currentCount = initialCount;
-    this._reset();
-  }
-
-  _reset() {
-    this.currentCount = this.initialCount;
-    this.promise = new Promise<boolean>((resolve, reject) => {
-      this.resolver = resolve;
-    });
-  }
-  async waitFor() {
-    await this.promise;
-  }
-
-  countDown() {
-    this.currentCount -= 1;
-    if (this.currentCount === 0) {
-      this.resolver?.(true);
-      this._reset();
-    }
-  }
-}
-
-export async function createMediaSource(sourcePath: string) {
+export async function createMediaSource(sourcePath: string): Promise<MediaSourceContainer> {
   console.log(sourcePath);
   const readableStream = await getStream(sourcePath);
 
@@ -86,12 +55,12 @@ export async function createMediaSource(sourcePath: string) {
               sourceBuffer.onupdate = () => resolve();
               sourceBuffer.appendBuffer(arrayBuffer);
               bytesRead += arrayBuffer.length;
-              console.log(`read ${bytesRead}`);
-              if (bytesRead > 1 * 100 * 1024) {
+              console.log(`read ${bytesRead / 1024 / 1024} MiB`);
+              if (bytesRead > 256 * 1024) {
                 bufferLatch.countDown();
               }
             } catch (e) {
-              console.log('At Error', bytesRead);
+              console.log(`Error: ${e.name} after reading ${bytesRead / 1024 / 1024} MiB`);
               if (e.name !== 'QuotaExceededError') {
                 throw e;
               }
@@ -104,7 +73,7 @@ export async function createMediaSource(sourcePath: string) {
       close() {
         mediaSource.endOfStream();
         bufferLatch.countDown();
-        console.log('bytesRead', bytesRead);
+        console.log(`Total Bytes Read ${bytesRead / 1024 / 1024} MiB`);
       },
     }, queuingStrategy))
   });
@@ -115,7 +84,7 @@ export async function createMediaSource(sourcePath: string) {
   function clearHead(duration: number) {
     if (mediaSource.readyState === 'open') {
       const sourceBuffer = mediaSource.sourceBuffers[0];
-      console.log('clearHead');
+      console.log('clearHead', sourcePath);
       if (sourceBuffer) {
         sourceBuffer.remove(0, duration);
         sourceBuffer.onupdate = () => {
@@ -128,6 +97,7 @@ export async function createMediaSource(sourcePath: string) {
     clearHead,
     mediaSource,
     bufferLatch,
+    readableStream,
   };
 }
 

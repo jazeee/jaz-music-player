@@ -5,7 +5,7 @@ import SkipNextIcon from '@material-ui/icons/SkipNext';
 import VolumeIcon from '@material-ui/icons/VolumeUpRounded';
 import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
 import { PLAYER_STATE, useMusicPlayerContext } from "./MusicPlayerProvider";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { VolumeDialog } from "./components/VolumeDialog";
 
 const MusicProgress = styled(Slider)({
@@ -23,7 +23,7 @@ export function MusicPlayer() {
   const {
     audioElement,
     setAudioElement,
-    mediaSourceObjectUrl,
+    mediaSourceContainer,
     currentFullFilePath,
     goToNext,
     goToPrevious,
@@ -41,11 +41,12 @@ export function MusicPlayer() {
   } = useMusicPlayerContext();
   const [volumeSelectIsVisible, setVolumeSelectIsVisible] = useState(false);
   const displayedTime = Number.isFinite(playbackTime) ? playbackTime : Number(currentMusicDatum.durationInSeconds);
+  const mediaSourceObjectUrl = useMemo(() => mediaSourceContainer ? URL.createObjectURL(mediaSourceContainer.mediaSource) : undefined, [mediaSourceContainer]);
 
   return (
     <>
       <Container>
-        {Boolean(currentFullFilePath) &&
+        {Boolean(currentFullFilePath) && Boolean(mediaSourceObjectUrl) &&
           <audio ref={setAudioElement} src={mediaSourceObjectUrl} onEnded={goToNext} onWaiting={() => { setIsLoading(true) }}
             onError={() => {setIsLoading(false)}}
             onPlaying={() => { setIsLoading(false) }}

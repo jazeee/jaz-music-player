@@ -26,7 +26,7 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
   const [error, setError] = useState('');
 
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>();
-  const [mediaSourceObjectUrl, setMediaSourceObjectUrl] = useState<string>('');
+  const [mediaSourceContainer, setMediaSourceContainer] = useState<MediaSourceContainer>();
   const playListMusicIndices = useMemo(() => {
     return [...selectedIndices];
   }, [selectedIndices]);
@@ -77,11 +77,12 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
   }, [updatePlayer, playerState])
 
   useEffect(() => {
-    let currentInterval: NodeJS.Timeout;
     if (currentFullFilePath) {
-      createMediaSource(currentFullFilePath).then(({ mediaSource, bufferLatch, clearHead}) => {
+      let cleanUp: () => void;
+      createMediaSource(currentFullFilePath).then((mediaSourceContainer) => {
         setPlayerState(PLAYER_STATE.PAUSED);
-        setMediaSourceObjectUrl(URL.createObjectURL(mediaSource));
+        setMediaSourceContainer(mediaSourceContainer);
+        const { bufferLatch, clearHead, readableStream } = mediaSourceContainer;
         bufferLatch.waitFor().then(() => {
           setPlayerState(playerState => {
             if (playerState !== PLAYER_STATE.UNSET) {
@@ -90,15 +91,17 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
             return playerState;
           });
         })
-        if (typeof clearHead === 'function') {
-          currentInterval = setInterval(() => clearHead(15), 20 * 1000);
+        let currentInterval = setInterval(() => clearHead(15), 20 * 1000);
+        cleanUp = function() {
+          readableStream.cancel();
+          clearInterval(currentInterval);
         }
       })
+      return () => {
+        cleanUp?.();
+      }
     }
-    return () => {
-      clearInterval(currentInterval);
-    }
-  }, [currentFullFilePath, updatePlayer]);
+  }, [currentFullFilePath]);
 
   useEffect(() => {
     setNowPlayingIndex(0);
@@ -131,7 +134,7 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
 
   return {
     audioElement,
-    mediaSourceObjectUrl,
+    mediaSourceContainer,
     setAudioElement,
     currentFullFilePath,
     currentMusicDatum,
