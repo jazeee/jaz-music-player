@@ -2,7 +2,7 @@ import { useSelectedMusicContext } from "../../SelectedMusic";
 import { MusicCard } from "./MusicCard";
 import { FixedSizeList } from 'react-window';
 import { useMusicPlayerContext } from "../../MusicPlayer/MusicPlayerProvider";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { ROW_HEIGHT_IN_PX } from "../../constants";
 
 interface Props {
@@ -13,16 +13,20 @@ interface Props {
 export function MusicItems(props: Props) {
   const { width, height } = props;
   const { music } = useSelectedMusicContext();
-  const listRef = useRef<FixedSizeList>();
+  const [listRef, setListRef] = useState<FixedSizeList>();
   const { nowPlayingIndex } = useMusicPlayerContext();
 
   useEffect(() => {
-    listRef.current?.scrollToItem(nowPlayingIndex);
-  }, [nowPlayingIndex]);
+    const timeout = setTimeout(() => {
+      // For some reason, scrolling needs to occur after a short while.
+      listRef?.scrollToItem(nowPlayingIndex);
+    });
+    return () => {clearTimeout(timeout)};
+  }, [listRef, nowPlayingIndex]);
   return (
     <FixedSizeList
       // @ts-ignore
-      ref={listRef}
+      ref={setListRef}
       height={height}
       itemCount={music.length}
       itemSize={ROW_HEIGHT_IN_PX}

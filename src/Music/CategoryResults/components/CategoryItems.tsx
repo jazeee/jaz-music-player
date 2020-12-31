@@ -1,5 +1,5 @@
 import { FixedSizeList } from 'react-window';
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { CategoryRow } from "./CategoryRow";
 import { useCategoryItemsContext } from '../CategoryItemsProvider';
 import { ROW_HEIGHT_IN_PX } from '../../constants';
@@ -12,16 +12,20 @@ interface Props {
 export function CategoryItems(props: Props) {
   const { width, height } = props;
   const { selectedIndex, availableItems } = useCategoryItemsContext();
-  const listRef = useRef<FixedSizeList>();
+  const [listRef, setListRef] = useState<FixedSizeList>();
 
   useEffect(() => {
-    listRef.current?.scrollToItem(selectedIndex);
-  }, [selectedIndex]);
+    const timeout = setTimeout(() => {
+      // For some reason, scrolling needs to occur after a short while.
+      listRef?.scrollToItem(selectedIndex);
+    });
+    return () => { clearTimeout(timeout) };
+  }, [listRef, selectedIndex]);
 
   return (
     <FixedSizeList
       // @ts-ignore
-      ref={listRef}
+      ref={setListRef}
       height={height}
       itemCount={availableItems.length}
       itemSize={ROW_HEIGHT_IN_PX}
