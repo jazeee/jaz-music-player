@@ -76,7 +76,7 @@ export async function createMediaSource(sourcePath: string): Promise<MediaSource
           sourceBuffer.appendBuffer(value);
           bytesRead += value.length;
           console.log(`read ${bytesRead / 1024 / 1024} MiB`);
-          if (bytesRead > 256 * 1024) {
+          if (bytesRead > 64 * 1024) {
             bufferLatch.countDown();
           }
         } catch (e) {

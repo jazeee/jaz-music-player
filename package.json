@@ -31,7 +31,7 @@
   },
   "scripts": {
     "start": "BROWSER=none PORT=4242 REACT_APP_MUSIC_SRC=http://localhost:4242 react-scripts start",
-    "build": "react-scripts build",
+    "build": "REACT_APP_GIT_HASH=$(git rev-parse HEAD) react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

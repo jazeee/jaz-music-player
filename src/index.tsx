@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import {App} from './App/App';
 import reportWebVitals from './monitoring/reportWebVitals';
 
+console.log(process.env.REACT_APP_GIT_HASH);
+
 ReactDOM.render(
   <React.StrictMode>
     <App />

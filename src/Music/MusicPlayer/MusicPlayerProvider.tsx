@@ -91,7 +91,8 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
             return playerState;
           });
         })
-        let currentInterval = setInterval(() => clearHead(15), 20 * 1000);
+        // FIXME - move to playback process
+        let currentInterval = setInterval(() => clearHead(15), 30 * 1000);
         cleanUp = function() {
           abort();
           clearInterval(currentInterval);
