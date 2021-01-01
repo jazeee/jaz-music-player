@@ -35,7 +35,8 @@ export async function getStream(sourcePath: string): Promise<ReadableStream<Uint
 export async function createMediaSource(sourcePath: string): Promise<MediaSourceContainer> {
   console.log(sourcePath);
   const readableStream = await getStream(sourcePath);
-
+  const reader = readableStream.getReader();
+  let readingIsEnabled = true;
   const continueLoadingLatch = new ResettingCountDownLatch();
   const bufferLatch = new ResettingCountDownLatch();
   const mediaSource = new MediaSource();
@@ -43,39 +44,51 @@ export async function createMediaSource(sourcePath: string): Promise<MediaSource
     const mime = 'audio/mpeg';
     const sourceBuffer = mediaSource.addSourceBuffer(mime);
 
-    const queuingStrategy = new CountQueuingStrategy({ highWaterMark: 1 });
-    let bytesRead = 0;
-    readableStream.pipeTo(new WritableStream({
-      write(arrayBuffer) {
-        return new Promise((resolve) => {
-          function appendToBuffer() {
-            // Unfortunately, there is no way to predict whether the buffer will take the next block
-            // See https://developers.google.com/web/updates/2017/10/quotaexceedederror
-            try {
-              sourceBuffer.onupdate = () => resolve();
-              sourceBuffer.appendBuffer(arrayBuffer);
-              bytesRead += arrayBuffer.length;
-              console.log(`read ${bytesRead / 1024 / 1024} MiB`);
-              if (bytesRead > 256 * 1024) {
-                bufferLatch.countDown();
-              }
-            } catch (e) {
-              console.log(`Error: ${e.name} after reading ${bytesRead / 1024 / 1024} MiB`);
-              if (e.name !== 'QuotaExceededError') {
-                throw e;
-              }
-              continueLoadingLatch.waitFor().then(appendToBuffer);
-            }
-          }
-          appendToBuffer();
-        })
-      },
-      close() {
+    function finalizeStream() {
+      if(mediaSource.readyState === 'open') {
         mediaSource.endOfStream();
-        bufferLatch.countDown();
-        console.log(`Total Bytes Read ${bytesRead / 1024 / 1024} MiB`);
-      },
-    }, queuingStrategy))
+      }
+      bufferLatch.countDown();
+      reader.cancel();
+      console.log(`Total Bytes Read ${bytesRead / 1024 / 1024} MiB`);
+    }
+
+    let bytesRead = 0;
+    reader.read().then(function processChunk({ done, value }) {
+      if (done || !readingIsEnabled) {
+        finalizeStream();
+        return;
+      }
+      function appendToBuffer() {
+        if (!readingIsEnabled) {
+          finalizeStream();
+          return;
+        }
+        // Unfortunately, there is no way to predict whether the buffer will take the next block
+        // See https://developers.google.com/web/updates/2017/10/quotaexceedederror
+        try {
+          sourceBuffer.onupdate = () => {
+            reader.read().then(processChunk);
+          };
+          if (!value) {
+            return;
+          }
+          sourceBuffer.appendBuffer(value);
+          bytesRead += value.length;
+          console.log(`read ${bytesRead / 1024 / 1024} MiB`);
+          if (bytesRead > 256 * 1024) {
+            bufferLatch.countDown();
+          }
+        } catch (e) {
+          console.log(`Error: ${e.name} after reading ${bytesRead / 1024 / 1024} MiB`);
+          if (e.name !== 'QuotaExceededError') {
+            throw e;
+          }
+          continueLoadingLatch.waitFor().then(appendToBuffer);
+        }
+      }
+      appendToBuffer();
+    });
   });
 
   mediaSource.addEventListener('sourceclosed', () => console.log('sourceclosed'));
@@ -93,11 +106,16 @@ export async function createMediaSource(sourcePath: string): Promise<MediaSource
       }
     }
   }
+  function abort() {
+    readingIsEnabled = false;
+    continueLoadingLatch.countDown();
+  }
   return {
     clearHead,
     mediaSource,
     bufferLatch,
     readableStream,
+    abort,
   };
 }
 

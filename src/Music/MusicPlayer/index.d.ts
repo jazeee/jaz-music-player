@@ -3,4 +3,5 @@ interface MediaSourceContainer {
   clearHead: (duration: number) => void,
   bufferLatch: ResettingCountDownLatch,
   readableStream: ReadableStream,
+  abort: () => void,
 }

@@ -82,7 +82,7 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
       createMediaSource(currentFullFilePath).then((mediaSourceContainer) => {
         setPlayerState(PLAYER_STATE.PAUSED);
         setMediaSourceContainer(mediaSourceContainer);
-        const { bufferLatch, clearHead, readableStream } = mediaSourceContainer;
+        const { bufferLatch, clearHead, abort } = mediaSourceContainer;
         bufferLatch.waitFor().then(() => {
           setPlayerState(playerState => {
             if (playerState !== PLAYER_STATE.UNSET) {
@@ -93,7 +93,7 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
         })
         let currentInterval = setInterval(() => clearHead(15), 20 * 1000);
         cleanUp = function() {
-          readableStream.cancel();
+          abort();
           clearInterval(currentInterval);
         }
       })
