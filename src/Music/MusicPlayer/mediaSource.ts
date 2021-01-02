@@ -56,6 +56,7 @@ export async function createMediaSource(sourcePath: string): Promise<MediaSource
     }
 
     let bytesRead = 0;
+    let lastBytesReadReported = 0;
     reader.read().then(function processChunk({ done, value }) {
       if (done || !readingIsEnabled) {
         finalizeStream();
@@ -83,7 +84,10 @@ export async function createMediaSource(sourcePath: string): Promise<MediaSource
           }
           sourceBuffer.appendBuffer(value);
           bytesRead += value.length;
-          console.log(`read ${bytesRead / 1024 / 1024} MiB`);
+          if (bytesRead - lastBytesReadReported > 1024 * 1024) {
+            lastBytesReadReported = bytesRead;
+            console.log(`read ${bytesRead / 1024 / 1024} MiB`);
+          }
           if (bytesRead > 64 * 1024) {
             bufferLatch.countDown();
           }
@@ -126,76 +130,3 @@ export async function createMediaSource(sourcePath: string): Promise<MediaSource
     abort,
   };
 }
-
-// export async function createMediaSource2(sourcePath: string) {
-//   const buffers: Array<Uint8Array> = [];
-
-//   let isStreamCompleted = false;
-//   const readableStream = await getStream(sourcePath);
-//   const queuingStrategy = new CountQueuingStrategy({ highWaterMark: 1 });
-//   let bytesRead = 0;
-//   readableStream.pipeTo(new WritableStream({
-//     write(arrayBuffer) {
-//       return new Promise((resolve) => {
-//         buffers.push(arrayBuffer);
-//         bytesRead += arrayBuffer.length;
-//         resolve();
-//       })
-//     },
-//     close() {
-//       isStreamCompleted = true;
-//       console.log('bytesRead', bytesRead);
-//     },
-//   }, queuingStrategy))
-
-//   const mediaSource = new MediaSource();
-//   mediaSource.addEventListener('sourceopen', function() {
-//     const mime = 'audio/mpeg';
-//     const sourceBuffer = mediaSource.addSourceBuffer(mime);
-
-//     let lastTimeout: NodeJS.Timeout;
-//     function appendNextBuffer(callerName: string) {
-//       console.debug(callerName, sourcePath);
-//       if (!sourceBuffer.updating) {
-//         const arrayBuffer = buffers[0];
-//         let nextTimeoutDelay: number | void = undefined;
-//         if (arrayBuffer) {
-//           try {
-//             // Unfortunately, there is no way to predict whether the buffer will take the next block
-//             // See https://developers.google.com/web/updates/2017/10/quotaexceedederror
-//             sourceBuffer.appendBuffer(arrayBuffer);
-//             buffers.shift();
-//           } catch (e) {
-//             if (e.name !== 'QuotaExceededError') {
-//               throw e;
-//             }
-//             console.debug('Buffer is full, so waiting for a bit');
-//             // Delay about 12KB of time (bitrate * time)
-//             nextTimeoutDelay = 256;
-//           }
-//         } else {
-//           if (isStreamCompleted) {
-//             mediaSource.endOfStream();
-//           } else {
-//             nextTimeoutDelay = 64;
-//           }
-//         }
-//         if (nextTimeoutDelay != null) {
-//           clearTimeout(lastTimeout);
-//           lastTimeout = setTimeout(() => appendNextBuffer(`Waiting to reappend ${nextTimeoutDelay} msec`), nextTimeoutDelay);
-//         }
-//       } else {
-//         console.log('waiting for buffer updated')
-//       }
-//     }
-//     sourceBuffer.onupdate = () => appendNextBuffer('From onupdate');
-//     appendNextBuffer('Initial call');
-//   })
-
-//   mediaSource.addEventListener('sourceclosed', () => console.log('sourceclosed'));
-//   mediaSource.addEventListener('sourceended', () => console.log('sourceended'));
-//   return {
-//     mediaSource,
-//     clearHead: undefined,
-//   };
-// }
