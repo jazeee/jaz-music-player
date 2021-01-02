@@ -43,6 +43,7 @@ export async function createMediaSource(sourcePath: string): Promise<MediaSource
   mediaSource.addEventListener('sourceopen', function () {
     const mime = 'audio/mpeg';
     const sourceBuffer = mediaSource.addSourceBuffer(mime);
+    sourceBuffer.onerror = console.error;
 
     function finalizeStream() {
       sourceBuffer.onupdate = null;
@@ -66,12 +67,13 @@ export async function createMediaSource(sourcePath: string): Promise<MediaSource
           return;
         }
         sourceBuffer.onupdate = () => {
+          const delayTime = Math.min(Math.floor(bytesRead / (32 * 1024)) + 1, 128);
           // onupdate is called after appendBuffer has completed.
           setTimeout(() => {
             // Processing chunks (appendBuffer) appears to be CPU intensive, which is a bit expensive on mobile.
             // Slow down the read process a little, to spread out the processing time.
             reader.read().then(processChunk);
-          }, 500);
+          }, delayTime);
         };
         // Unfortunately, there is no way to predict whether the buffer will take the next block
         // See https://developers.google.com/web/updates/2017/10/quotaexceedederror
