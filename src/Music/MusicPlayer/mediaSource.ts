@@ -32,8 +32,9 @@ export async function getStream(sourcePath: string): Promise<ReadableStream<Uint
 // // filePath = 'http://localhost:4242/Genesis/Genesis/08 Silver Rainbow.mp3'
 // filePath = 'http://localhost:4242/Jethro Tull/A Little Light Music/05 Rocks on the Road.mp3'
 
+const CACHE_BUFFER_SIZE = 32 * 1024;
 export async function createMediaSource(sourcePath: string): Promise<MediaSourceContainer> {
-  console.log(sourcePath);
+  console.log(`Loading ${sourcePath} into buffer.`);
   const readableStream = await getStream(sourcePath);
   const reader = readableStream.getReader();
   let readingIsEnabled = true;
@@ -57,11 +58,28 @@ export async function createMediaSource(sourcePath: string): Promise<MediaSource
 
     let bytesRead = 0;
     let lastBytesReadReported = 0;
-    reader.read().then(function processChunk({ done, value }) {
+    reader.read().then(async function processChunk({ done, value }) {
       if (done || !readingIsEnabled) {
         finalizeStream();
         return;
       }
+      // Merge small value lengths. (nginx seems to be pushing a 2-3 KB at a time.)
+      let bufferByteCount = 0;
+      const buffers: Array<Uint8Array> = [];
+      async function appendValue(nextValue: Uint8Array | undefined) {
+        if (nextValue) {
+          bufferByteCount += nextValue.length;
+          buffers.push(nextValue);
+        }
+        if (bufferByteCount < CACHE_BUFFER_SIZE) {
+          await reader.read().then(async function ({ done, value }) {
+            if (!done) {
+              await appendValue(value);
+            }
+          })
+        }
+      }
+      await appendValue(value);
       function appendToBuffer() {
         if (!readingIsEnabled) {
           finalizeStream();
@@ -79,11 +97,15 @@ export async function createMediaSource(sourcePath: string): Promise<MediaSource
         // Unfortunately, there is no way to predict whether the buffer will take the next block
         // See https://developers.google.com/web/updates/2017/10/quotaexceedederror
         try {
-          if (!value) {
-            return;
-          }
-          sourceBuffer.appendBuffer(value);
-          bytesRead += value.length;
+          if(!buffers.length) {return}
+          let bytes: Uint8Array = new Uint8Array(bufferByteCount);
+          let offset = 0;
+          buffers.forEach(buffer => {
+            bytes.set(buffer, offset);
+            offset += buffer.length;
+          });
+          sourceBuffer.appendBuffer(bytes);
+          bytesRead += bytes.length;
           if (bytesRead - lastBytesReadReported > 1024 * 1024) {
             lastBytesReadReported = bytesRead;
             console.log(`read ${bytesRead / 1024 / 1024} MiB`);
