@@ -45,6 +45,7 @@ export async function createMediaSource(sourcePath: string): Promise<MediaSource
     const sourceBuffer = mediaSource.addSourceBuffer(mime);
 
     function finalizeStream() {
+      sourceBuffer.onupdate = null;
       if(mediaSource.readyState === 'open') {
         mediaSource.endOfStream();
       }
@@ -64,12 +65,17 @@ export async function createMediaSource(sourcePath: string): Promise<MediaSource
           finalizeStream();
           return;
         }
+        sourceBuffer.onupdate = () => {
+          // onupdate is called after appendBuffer has completed.
+          setTimeout(() => {
+            // Processing chunks (appendBuffer) appears to be CPU intensive, which is a bit expensive on mobile.
+            // Slow down the read process a little, to spread out the processing time.
+            reader.read().then(processChunk);
+          }, 500);
+        };
         // Unfortunately, there is no way to predict whether the buffer will take the next block
         // See https://developers.google.com/web/updates/2017/10/quotaexceedederror
         try {
-          sourceBuffer.onupdate = () => {
-            reader.read().then(processChunk);
-          };
           if (!value) {
             return;
           }

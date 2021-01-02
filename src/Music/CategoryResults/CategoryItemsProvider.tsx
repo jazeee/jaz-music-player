@@ -44,7 +44,7 @@ export function useCategoryItems(props: Props) {
       if (isShuffling) {
         shuffle(newSelectedIndices);
       }
-      setSelectedIndices(new Set(newSelectedIndices));
+      setSelectedIndices([...new Set(newSelectedIndices)]);
     }
   }, [category, selectedCategoryItem, setSelectedIndices, musicByCategory, isShuffling]);
 

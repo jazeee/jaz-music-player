@@ -27,9 +27,7 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
 
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>();
   const [mediaSourceContainer, setMediaSourceContainer] = useState<MediaSourceContainer>();
-  const playListMusicIndices = useMemo(() => {
-    return [...selectedIndices];
-  }, [selectedIndices]);
+  const playListMusicIndices = selectedIndices;
   const playListLength = playListMusicIndices?.length ?? 1;
 
   const currentMusicIndex = playListMusicIndices?.[nowPlayingIndex];

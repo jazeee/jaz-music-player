@@ -12,7 +12,7 @@ interface Props {
 
 export function MusicItems(props: Props) {
   const { width, height } = props;
-  const { music } = useSelectedMusicContext();
+  const { selectedIndices } = useSelectedMusicContext();
   const [listRef, setListRef] = useState<FixedSizeList>();
   const { nowPlayingIndex } = useMusicPlayerContext();
 
@@ -28,7 +28,7 @@ export function MusicItems(props: Props) {
       // @ts-ignore
       ref={setListRef}
       height={height}
-      itemCount={music.length}
+      itemCount={selectedIndices.length}
       itemSize={ROW_HEIGHT_IN_PX}
       width={width}
     >
