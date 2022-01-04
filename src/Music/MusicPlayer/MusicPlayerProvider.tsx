@@ -1,5 +1,5 @@
 import constate from 'constate';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSelectedMusicContext } from '../SelectedMusic';
 import { musicData } from '../data/data';
 import { CategoryType } from '../data/categories';
@@ -50,7 +50,7 @@ export function useMusicPlayer({ categoryType }: {categoryType: CategoryType}) {
       case PLAYER_STATE.PLAYING:
         audioElement.play().catch((error) => {
           updatePlayer(PLAYER_STATE.PAUSED);
-          console.error(error);
+          console.error(audioElement, error);
           setError(error.message);
         })
         break;

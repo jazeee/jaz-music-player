@@ -1,7 +1,7 @@
 import { ResettingCountDownLatch } from "../../utils/ResettingCountDownLatch";
 
 export async function getStream(sourcePath: string): Promise<ReadableStream<Uint8Array>> {
-  const response = await fetch(sourcePath);
+  const response = await fetch(sourcePath, { mode: 'cors' });
   if (!response.body) {
     throw new Error('API responded with no body');
   }
@@ -113,10 +113,10 @@ export async function createMediaSource(sourcePath: string): Promise<MediaSource
           if (bytesRead > 64 * 1024) {
             bufferLatch.countDown();
           }
-        } catch (e) {
-          console.log(`Error: ${e.name} after reading ${bytesRead / 1024 / 1024} MiB`);
-          if (e.name !== 'QuotaExceededError') {
-            throw e;
+        } catch (error) {
+          console.log(`Error: ${error.name} after reading ${bytesRead / 1024 / 1024} MiB`);
+          if (error.name !== 'QuotaExceededError') {
+            throw error;
           }
           continueLoadingLatch.waitFor().then(appendToBuffer);
         }

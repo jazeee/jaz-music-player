@@ -19,7 +19,7 @@ musicData.forEach((datum, index) => {
   let { year } = tags;
   let decade = '-';
   if (year) {
-    decade = year.replace(/.$/, '0');
+    decade = String(year).replace(/.$/, '0');
   } else {
     year = '-';
   }
